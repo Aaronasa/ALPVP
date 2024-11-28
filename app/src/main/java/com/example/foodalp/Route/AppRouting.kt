@@ -2,6 +2,7 @@ package com.example.foodalp.Route
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.foodalp.View.Launchview
+import com.example.foodalp.View.Welcomeview
 import kotlinx.coroutines.delay
 
 enum class ListScreen {
@@ -37,7 +39,7 @@ fun AppRouting() {
                 LaunchScreen(navController)
             }
             composable(ListScreen.MainScreen.name) {
-                MainScreen()
+                Welcomeview()
             }
         }
     }
@@ -45,20 +47,12 @@ fun AppRouting() {
 
 @Composable
 fun LaunchScreen(navController: NavHostController) {
-    // Display the launch view
     Launchview()
 
-    // Automatically navigate to the main screen after 3 seconds
     LaunchedEffect(Unit) {
-        delay(3000) // 3 seconds delay
+        delay(3000)
         navController.navigate(ListScreen.MainScreen.name) {
             popUpTo(ListScreen.Launchview.name) { inclusive = true } // Remove Launchview from the back stack
         }
     }
-}
-
-@Composable
-fun MainScreen() {
-    // Replace with your actual main screen implementation
-    Text(text = "Welcome to the Main Screen!")
 }

@@ -33,7 +33,7 @@ fun Welcomeview() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 80.dp, end = 0.dp),
+                .padding(top = 80.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -43,6 +43,7 @@ fun Welcomeview() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
+                    .padding(end = 16.dp)
             )
 
             Text(
