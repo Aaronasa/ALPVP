@@ -43,7 +43,7 @@ import com.example.foodalp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterView() {
+fun LoginView() {
     val customFontFamily = FontFamily(
         Font(R.font.jua)
     )
@@ -98,7 +98,7 @@ fun RegisterView() {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Create Account",
+                        text = "Login Account",
                         fontSize = 24.sp,
                         color = Color(0xFFFFFFFF),
                         fontFamily = customFontFamily,
@@ -116,55 +116,28 @@ fun RegisterView() {
                             modifier = Modifier.padding(bottom = 4.dp, start = 5.dp)
                         )
                         TextField(
-                            value = "",
-                            onValueChange = { /* Handle perubahan teks */ },
+                            value = "",  // Nilai kosong
+                            onValueChange = { /* Handle perubahan teks jika perlu */ },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(
-                                    color = Color(0x33000000),
+                                    color = Color.Black.copy(alpha = 0.2f), // Menggunakan opacity dengan copy(alpha)
                                     shape = RoundedCornerShape(16.dp)
                                 ),
                             colors = TextFieldDefaults.textFieldColors(
-                                containerColor = Color.Transparent,
-                                cursorColor = Color.Black,
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent,
-                                disabledIndicatorColor = Color.Transparent
+                                containerColor = Color.Transparent, // Transparent background untuk text field
+                                cursorColor = Color.Black,  // Warna kursor
+                                focusedIndicatorColor = Color.Transparent,  // Menghilangkan indikator fokus
+                                unfocusedIndicatorColor = Color.Transparent, // Menghilangkan indikator tidak fokus
+                                disabledIndicatorColor = Color.Transparent // Menghilangkan indikator disabled
                             ),
                             textStyle = androidx.compose.ui.text.TextStyle(
-                                fontSize = 20.sp
+                                fontSize = 20.sp,
+                                color = Color.White // Teks berwarna putih
                             ),
                             singleLine = true
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "Email",
-                            fontSize = 14.sp,
-                            color = Color(0xFFFFFFFF),
-                            fontFamily = customFontFamily,
-                            modifier = Modifier.padding(bottom = 4.dp, start = 5.dp)
-                        )
-                        TextField(
-                            value = "",
-                            onValueChange = { /* Handle perubahan teks */ },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(
-                                    color = Color(0x33000000),
-                                    shape = RoundedCornerShape(16.dp)
-                                ),
-                            colors = TextFieldDefaults.textFieldColors(
-                                containerColor = Color.Transparent,
-                                cursorColor = Color.Black,
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent,
-                                disabledIndicatorColor = Color.Transparent
-                            ),
-                            textStyle = androidx.compose.ui.text.TextStyle(
-                                fontSize = 20.sp
-                            ),
-                            singleLine = true
-                        )
+
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             text = "Password",
@@ -209,7 +182,7 @@ fun RegisterView() {
                         shape = RoundedCornerShape(10.dp)
                     ) {
                         Text(
-                            text = "Sign Up",
+                            text = "Sign In",
                             fontSize = 22.sp,
                             fontFamily = com.example.foodalp.View.customFontFamily
                         )
@@ -223,6 +196,6 @@ fun RegisterView() {
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun DefaultPreview2() {
-    RegisterView()
+fun DefaultPreview4() {
+    LoginView()
 }

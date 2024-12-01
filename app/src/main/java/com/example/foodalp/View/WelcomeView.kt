@@ -18,14 +18,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.foodalp.R
+import com.example.foodalp.Route.ListScreen
 
 val customFontFamily = FontFamily(
     Font(R.font.jua)
 )
 
 @Composable
-fun Welcomeview() {
+fun Welcomeview(
+    navController: NavHostController
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -57,25 +62,30 @@ fun Welcomeview() {
             )
 
             Button(
-                onClick = { /* TODO: Add navigation or functionality */ },
+                onClick = {
+                    navController.navigate(ListScreen.Registerview.name)
+                },
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
                     .padding(bottom = 8.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF991E3D),
-                    contentColor = Color.White
+                    contentColor = Color(0xFFFFFFFF)
                 ),
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Text(
                     text = "Register",
                     fontSize = 22.sp,
+                    color = Color(0xFFFFFFFF),
                     fontFamily = customFontFamily
                 )
             }
 
             Button(
-                onClick = { /* TODO: Add navigation or functionality */ },
+                onClick = {
+                    navController.navigate(ListScreen.Loginview.name)
+                },
                 modifier = Modifier
                     .fillMaxWidth(0.8f),
                 colors = ButtonDefaults.buttonColors(
@@ -105,5 +115,5 @@ fun Welcomeview() {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun DefaultPreview1() {
-    Welcomeview()
+    Welcomeview(navController = rememberNavController())
 }
