@@ -25,6 +25,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,6 +51,8 @@ fun LoginView() {
     val customFontFamily = FontFamily(
         Font(R.font.jua)
     )
+    var username by remember{ mutableStateOf("") }
+    var password by remember{ mutableStateOf("") }
     Box(modifier = Modifier.fillMaxHeight()) {
         Box(
             modifier = Modifier
@@ -108,6 +114,7 @@ fun LoginView() {
                         modifier = Modifier
                             .fillMaxWidth()
                     ) {
+
                         Text(
                             text = "Username",
                             fontSize = 14.sp,
@@ -116,8 +123,8 @@ fun LoginView() {
                             modifier = Modifier.padding(bottom = 4.dp, start = 5.dp)
                         )
                         TextField(
-                            value = "",  // Nilai kosong
-                            onValueChange = { /* Handle perubahan teks jika perlu */ },
+                            value = username,
+                            onValueChange = { username = it },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(
@@ -147,8 +154,8 @@ fun LoginView() {
                             modifier = Modifier.padding(bottom = 4.dp, start = 5.dp)
                         )
                         TextField(
-                            value = "",
-                            onValueChange = { /* Handle perubahan teks */ },
+                            value = password,
+                            onValueChange = { password = it },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(
