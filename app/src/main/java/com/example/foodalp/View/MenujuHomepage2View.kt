@@ -32,7 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.foodalp.R
 
 @Composable
-fun MenujuHomepage1View(
+fun MenujuHomepage2View(
     navController: NavHostController
 ){
     val customFontFamily = FontFamily(
@@ -54,12 +54,12 @@ fun MenujuHomepage1View(
                     )
                     .padding(16.dp, 50.dp, 16.dp, 26.dp),
 
-            ) {
+                ) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Destinasi Rasa",
+                    Text("Temu Rasa",
                         fontSize = 36.sp,
                         fontFamily = customFontFamily,
                         fontWeight = FontWeight.SemiBold
@@ -69,40 +69,51 @@ fun MenujuHomepage1View(
             }
 
             Column(modifier = Modifier.fillMaxWidth()
-                .padding(top = 80.dp,start = 10.dp, end = 10.dp),
+                .padding(top = 40.dp,start = 10.dp, end = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally) {
                 Box(
                     modifier = Modifier
-                        .size(200.dp)
+                        .size(300.dp)
                         .background(
-                            color = Color.White,
+                            color = Color.Transparent,
                             shape = RoundedCornerShape(20.dp)
                         ),
                     contentAlignment = Alignment.Center
                 ) {
+                    Box(
+                        modifier = Modifier
+                            .size(200.dp)
+                            .background(
+                                color = Color.White,
+                                shape = RoundedCornerShape(20.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+
+                    }
                     Image(
-                        painter = painterResource(id = R.drawable.map),
+                        painter = painterResource(id = R.drawable.temurasa),
                         contentDescription = "Map Icon",
-                        modifier = Modifier.size(200.dp)
+                        modifier = Modifier.size(300.dp)
                             .padding(top = 10.dp),
                         contentScale = ContentScale.Fit
                     )
                 }
 
                 Text(
-                    text = "Rasalanka features a destination search that helps you discover the best local dishes and souvenirs in your travel city.",
+                    text = "This feature allows users to explore unique local dishes and souvenirs from the city they select. After choosing a city, the app displays a list of traditional foods and local specialties. Users can click on any item to see a list of restaurants or shops offering it, complete with locations, ratings, and additional details.",
                     color = Color.White,
-                    fontSize = 18.sp,
+                    fontSize = 16.sp,
                     fontFamily = customFontFamily,
                     fontWeight = FontWeight.Normal,
                     textAlign = TextAlign.Center,
                     lineHeight = 28.sp,
-                    modifier = Modifier.padding(top = 80.dp)
+                    modifier = Modifier.padding(top = 40.dp)
 
                 )
 
-                Image(painter = painterResource(id = R.drawable.pagecontrol1),
-                    contentDescription = "pagecontrol1",
+                Image(painter = painterResource(id = R.drawable.pagecontrol2),
+                    contentDescription = "pagecontrol2",
                     modifier = Modifier.size(250.dp)
                         .padding(top = 20.dp)
                 )
@@ -115,6 +126,6 @@ fun MenujuHomepage1View(
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun MenujuHomepage1PreView() {
-    MenujuHomepage1View(navController = rememberNavController())
+fun MenujuHomepage2PreView() {
+    MenujuHomepage2View(navController = rememberNavController())
 }
