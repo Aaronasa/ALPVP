@@ -69,14 +69,14 @@ fun RegisterView() {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(1f)
-                    .padding(end = 16.dp),
+//                    .aspectRatio(1f)
+                    .padding(end = 16.dp, top = 70.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.rasalanka),
                     contentDescription = "Logo",
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.size(width = 350.dp, height = 200.dp),
                     contentScale = ContentScale.Crop
                 )
                 Text(
