@@ -128,15 +128,15 @@ fun LoginView() {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(
-                                    color = Color.Black.copy(alpha = 0.2f), // Menggunakan opacity dengan copy(alpha)
+                                    color = Color.Black.copy(alpha = 0.2f),
                                     shape = RoundedCornerShape(16.dp)
                                 ),
                             colors = TextFieldDefaults.textFieldColors(
-                                containerColor = Color.Transparent, // Transparent background untuk text field
-                                cursorColor = Color.Black,  // Warna kursor
-                                focusedIndicatorColor = Color.Transparent,  // Menghilangkan indikator fokus
-                                unfocusedIndicatorColor = Color.Transparent, // Menghilangkan indikator tidak fokus
-                                disabledIndicatorColor = Color.Transparent // Menghilangkan indikator disabled
+                                containerColor = Color.Transparent,
+                                cursorColor = Color.Black,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                disabledIndicatorColor = Color.Transparent
                             ),
                             textStyle = androidx.compose.ui.text.TextStyle(
                                 fontSize = 20.sp,
