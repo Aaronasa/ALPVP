@@ -29,20 +29,20 @@ interface AuthenticationAPIService {
         @POST("create")  // Make sure this matches your API endpoint
         suspend fun registerUser(@Body request: RegisterRequest): Response<RegisterResponse>
 
-    // Read User
-    @GET("/api/read")
-    suspend fun getUser(@Query("id") id: Int?): Response<UserResponse>
+//    // Read User
+//    @GET("read")
+//    suspend fun getUser Response<UserResponse>
 
     // Update User
-    @PUT("/api/update")
+    @PUT("update")
     suspend fun updateUser(@Body request: UpdateUserRequest): Response<UserResponse>
 
     // Delete User
-    @DELETE("/api/delete")
+    @DELETE("delete")
     suspend fun deleteUser(@Query("id") id: Int): Response<UserResponse>
 
     // Login User
-    @POST("/api/login")
+    @POST("login")
     suspend fun loginUser(@Body request: LoginRequest): Response<UserResponse>
 
 }
