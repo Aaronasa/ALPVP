@@ -1,18 +1,14 @@
-package com.example.foodalp.models
-
 // Response model for User-related API calls
 data class UserResponse(
-    val message: String,
-    val data: UserModel?
+    val data: UserModel // Jika tidak ada data pengguna, maka bisa null
 )
 
-// User data model that contains user details
 data class UserModel(
     val id: Int,
     val username: String,
     val email: String,
-    val token: String?, // The token is used for login and authentication
-    val role: RoleModel
+    val token: String,
+    val roleId: Int
 )
 
 // Role model representing the user's role
@@ -21,40 +17,47 @@ data class RoleModel(
     val name: String
 )
 
-// Request model for login, to send email and password
+// Request model for login
 data class LoginRequest(
     val email: String,
     val password: String
 )
 
-// Request model for registration, to send username, email, and password
+data class LoginResponse(
+    val message: String,
+    val data: UserModel
+)
+
+// Request model for registration
 data class RegisterRequest(
     val email: String,
     val password: String,
     val username: String
 )
 
-// Request model for updating user, to send new username and email
+// Request model for updating user
 data class UpdateUserRequest(
     val username: String,
     val email: String
 )
 
-// Request model for deleting a user, contains user ID
+// Request model for deleting a user
 data class DeleteUserRequest(
     val id: Int
 )
 
+// Register response model
 data class RegisterResponse(
     val message: String,
     val data: UserData
 )
 
+// Model for user data in register response
 data class UserData(
     val id: Int,
     val username: String,
     val email: String,
-    val password: String,  // You might not need to store the password in the response, but it's included here.
-    val token: String?,    // Token might be null initially if not provided.
+    val password: String, // Password disertakan hanya pada pendaftaran
+    val token: String?,   // Token mungkin null pada awalnya
     val roleId: Int
 )

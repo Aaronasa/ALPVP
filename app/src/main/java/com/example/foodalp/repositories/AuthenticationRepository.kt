@@ -1,16 +1,14 @@
 package com.example.foodalp.repositories
 
-import com.example.foodalp.models.LoginRequest
-import com.example.foodalp.models.RegisterRequest
-import com.example.foodalp.models.RegisterResponse
-import com.example.foodalp.models.UserResponse
+import LoginRequest
+import RegisterRequest
 import com.example.foodalp.services.AuthenticationAPIService
 import retrofit2.Response
 
 // Interface for AuthenticationRepository
 interface AuthenticationRepository {
     suspend fun register(username: String, email: String, password: String): Response<RegisterResponse>
-    suspend fun login(email: String, password: String): Response<UserResponse>
+    suspend fun login(email: String, password: String): Response<LoginResponse>
 }
 
 // Network Authentication Repository implementation
@@ -23,21 +21,39 @@ class NetworkAuthenticationRepository(
         email: String,
         password: String
     ): Response<RegisterResponse> {
-        // Prepare the registration request using RegisterRequest model
+        // Validate input
+        if (username.isBlank() || email.isBlank() || password.isBlank()) {
+            throw IllegalArgumentException("All fields must be filled")
+        }
+
+        // Prepare the registration request
         val request = RegisterRequest(username, email, password)
 
-        // Call the API to register the user
-        return authenticationAPIService.registerUser(request)
+        return try {
+            // Call the API to register the user
+            authenticationAPIService.registerUser(request)
+        } catch (e: Exception) {
+            throw Exception("Failed to register: ${e.localizedMessage}", e)
+        }
     }
 
     override suspend fun login(
         email: String,
         password: String
-    ): Response<UserResponse> {
-        // Prepare the login request using LoginRequest model
+    ): Response<LoginResponse> {
+        // Validate input
+        if (email.isBlank() || password.isBlank()) {
+            throw IllegalArgumentException("Email and password are required")
+        }
+
+        // Prepare the login request
         val request = LoginRequest(email, password)
 
-        // Call the API to login the user
-        return authenticationAPIService.loginUser(request)
+        return try {
+            // Call the API to login the user
+            authenticationAPIService.loginUser(request)
+        } catch (e: Exception) {
+            throw Exception("Failed to login: ${e.localizedMessage}", e)
+        }
     }
 }

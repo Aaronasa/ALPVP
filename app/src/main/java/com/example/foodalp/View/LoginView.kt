@@ -1,58 +1,57 @@
 package com.example.foodalp.View
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.foodalp.R
+import com.example.foodalp.Route.ListScreen
+import com.example.foodalp.viewmodels.UserViewModel
+import com.example.foodalp.uiStates.UserStatusUIState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginView() {
+fun LoginView(
+    navController: NavHostController,
+    viewModel: UserViewModel = viewModel()
+) {
     val customFontFamily = FontFamily(
         Font(R.font.jua)
     )
-    var username by remember{ mutableStateOf("") }
-    var password by remember{ mutableStateOf("") }
+
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+    // Observe status state
+    val statusState = viewModel.statusState.observeAsState(UserStatusUIState.Idle)
+
     Box(modifier = Modifier.fillMaxHeight()) {
         Box(
             modifier = Modifier
@@ -116,15 +115,15 @@ fun LoginView() {
                     ) {
 
                         Text(
-                            text = "Username",
+                            text = "Email",
                             fontSize = 14.sp,
                             color = Color(0xFFFFFFFF),
                             fontFamily = customFontFamily,
                             modifier = Modifier.padding(bottom = 4.dp, start = 5.dp)
                         )
                         TextField(
-                            value = username,
-                            onValueChange = { username = it },
+                            value = email,
+                            onValueChange = { email = it },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(
@@ -140,7 +139,7 @@ fun LoginView() {
                             ),
                             textStyle = androidx.compose.ui.text.TextStyle(
                                 fontSize = 20.sp,
-                                color = Color.White // Teks berwarna putih
+                                color = Color.White
                             ),
                             singleLine = true
                         )
@@ -176,8 +175,11 @@ fun LoginView() {
                         )
                     }
                     Spacer(modifier = Modifier.height(25.dp))
+
                     Button(
-                        onClick = { /* TODO: Add navigation or functionality */ },
+                        onClick = {
+                            viewModel.loginUser(email, password) // Login request
+                        },
                         modifier = Modifier
                             .fillMaxWidth(0.6f)
                             .padding(bottom = 60.dp)
@@ -191,18 +193,37 @@ fun LoginView() {
                         Text(
                             text = "Sign In",
                             fontSize = 22.sp,
-                            fontFamily = com.example.foodalp.View.customFontFamily
+                            fontFamily = customFontFamily
                         )
+                    }
+
+                    // Handle status state (loading, success, error)
+                    when (statusState.value) {
+                        is UserStatusUIState.Loading -> {
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                        }
+                        is UserStatusUIState.Success -> {
+                            LaunchedEffect(Unit) {
+                                navController.navigate(ListScreen.HomePage.name) {
+                                    popUpTo(ListScreen.Loginview.name) {
+                                        inclusive = true
+                                    }
+                                }
+                            }
+                        }
+                        is UserStatusUIState.Error -> {
+                            val errorMessage = (statusState.value as UserStatusUIState.Error).message
+                            Text(text = "Error: $errorMessage", color = Color.Red)
+                        }
+                        UserStatusUIState.Idle -> {
+                            // Maybe show a placeholder or instruction
+                        }
+                        else -> {
+                            // Handle any unexpected state here
+                        }
                     }
                 }
             }
         }
     }
-}
-
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun DefaultPreview4() {
-    LoginView()
 }

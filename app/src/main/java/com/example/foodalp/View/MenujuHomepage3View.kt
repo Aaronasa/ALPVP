@@ -2,16 +2,9 @@ package com.example.foodalp.View
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,7 +14,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,98 +26,118 @@ import com.example.foodalp.R
 @Composable
 fun MenujuHomepage3View(
     navController: NavHostController
-){
+) {
     val customFontFamily = FontFamily(
         Font(R.font.jua)
     )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(color = Color(0xFF991E3D))
-
     ) {
-        Column {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        Color.White,
-                        shape = RoundedCornerShape(bottomEnd = 16.dp, bottomStart = 16.dp)
-                    )
-                    .padding(16.dp, 50.dp, 16.dp, 26.dp),
-
-                ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text("Pilihan Rasa",
-                        fontSize = 36.sp,
-                        fontFamily = customFontFamily,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-
-            }
-
-            Column(modifier = Modifier.fillMaxWidth()
-                .padding(top = 40.dp,start = 10.dp, end = 10.dp),
-                horizontalAlignment = Alignment.CenterHorizontally) {
+        Button(
+            onClick = {
+                navController.navigate("Homepage") // Navigasi ke Homepage4View
+            },
+            modifier = Modifier
+                .fillMaxSize(),
+            shape = RoundedCornerShape(0.dp), // Tombol memenuhi seluruh layar
+            contentPadding = PaddingValues(0.dp) // Tanpa padding
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize()
+                    .background(color = Color(0xFF991E3D)),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Header dengan teks "Pilihan Rasa"
                 Box(
                     modifier = Modifier
-                        .size(300.dp)
+                        .fillMaxWidth()
                         .background(
-                            color = Color.Transparent,
-                            shape = RoundedCornerShape(20.dp)
-                        ),
-                    contentAlignment = Alignment.Center
+                            Color.White,
+                            shape = RoundedCornerShape(bottomEnd = 16.dp, bottomStart = 16.dp)
+                        )
+                        .padding(16.dp, 50.dp, 16.dp, 26.dp),
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            "Pilihan Rasa",
+                            fontSize = 36.sp,
+                            fontFamily = customFontFamily,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFF0B1A3A)
+                        )
+                    }
+                }
+
+                // Bagian utama dengan deskripsi dan gambar
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 40.dp, start = 10.dp, end = 10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(200.dp)
+                            .size(300.dp)
                             .background(
-                                color = Color.White,
+                                color = Color.Transparent,
                                 shape = RoundedCornerShape(20.dp)
                             ),
                         contentAlignment = Alignment.Center
                     ) {
+                        // Background putih
+                        Box(
+                            modifier = Modifier
+                                .size(250.dp)
+                                .background(
+                                    color = Color.White,
+                                    shape = RoundedCornerShape(20.dp)
+                                )
+                        )
 
+                        // Gambar
+                        Image(
+                            painter = painterResource(id = R.drawable.img_5955_10),
+                            contentDescription = "Map Icon",
+                            modifier = Modifier
+                                .size(200.dp),
+                            contentScale = ContentScale.Fit
+                        )
                     }
+
+                    // Deskripsi
+                    Text(
+                        text = "This feature allows users to view a complete list of restaurants in a specific city. Users can compare prices and reviews for each restaurant. With this feature, they can choose the restaurant that best fits their preferences based on food quality, pricing, and customer experiences.",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 28.sp,
+                        modifier = Modifier.padding(top = 40.dp)
+                    )
+
+                    // Page control indicator
                     Image(
-                        painter = painterResource(id = R.drawable.temurasa),
-                        contentDescription = "Map Icon",
-                        modifier = Modifier.size(300.dp)
-                            .padding(top = 10.dp),
-                        contentScale = ContentScale.Fit
+                        painter = painterResource(id = R.drawable.pagecontrol3),
+                        contentDescription = "pagecontrol3",
+                        modifier = Modifier
+                            .size(250.dp)
+                            .padding(top = 20.dp)
                     )
                 }
-
-                Text(
-                    text = "This feature allows users to view a complete list of restaurants in a specific city. Users can compare prices and reviews for each restaurant. With this feature, they can choose the restaurant that best fits their preferences based on food quality, pricing, and customer experiences.",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontFamily = customFontFamily,
-                    fontWeight = FontWeight.Normal,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 28.sp,
-                    modifier = Modifier.padding(top = 40.dp)
-
-                )
-
-                Image(painter = painterResource(id = R.drawable.pagecontrol3),
-                    contentDescription = "pagecontrol3",
-                    modifier = Modifier.size(250.dp)
-                        .padding(top = 20.dp)
-                )
             }
         }
-
     }
-
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun MenujuHomepage3PreView() {
+fun MenujuHomepage3Preview() {
     MenujuHomepage3View(navController = rememberNavController())
 }
