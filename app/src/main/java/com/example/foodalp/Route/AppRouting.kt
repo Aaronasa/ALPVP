@@ -43,7 +43,7 @@ fun AppRouting() {
                 Welcomeview(navController)
             }
             composable(ListScreen.Registerview.name) {
-                RegisterView()
+                RegisterView(navController)
             }
             composable(ListScreen.Loginview.name) {
                 LoginView()
@@ -55,7 +55,6 @@ fun AppRouting() {
 @Composable
 fun LaunchScreen(navController: NavHostController) {
     Launchview()
-
     LaunchedEffect(Unit) {
         delay(3000)
         navController.navigate(ListScreen.Welcomeview.name) {
@@ -63,5 +62,3 @@ fun LaunchScreen(navController: NavHostController) {
         }
     }
 }
-
-
