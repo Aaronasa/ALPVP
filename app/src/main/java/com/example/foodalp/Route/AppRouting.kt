@@ -11,8 +11,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.foodalp.View.AppDescView
 import com.example.foodalp.View.Launchview
 import com.example.foodalp.View.LoginView
+import com.example.foodalp.View.HomePage
+import com.example.foodalp.View.MenujuHomepage1View
+import com.example.foodalp.View.MenujuHomepage2View
+import com.example.foodalp.View.MenujuHomepage3View
 import com.example.foodalp.View.RegisterView
 import com.example.foodalp.View.Welcomeview
 import kotlinx.coroutines.delay
@@ -21,7 +26,12 @@ enum class ListScreen {
     Launchview,
     Welcomeview,
     Registerview,
-    Loginview
+    Loginview,
+    MenujuHomepage1View,
+    MenujuHomepage2View,
+    MenujuHomepage3View,
+    AppDescView,
+    HomePage
 }
 
 @Composable
@@ -46,8 +56,26 @@ fun AppRouting() {
                 RegisterView(navController)
             }
             composable(ListScreen.Loginview.name) {
-                LoginView()
+                LoginView(navController)
             }
+            composable(ListScreen.MenujuHomepage1View.name) {
+                MenujuHomepage1View(navController)
+            }
+            composable(ListScreen.MenujuHomepage2View.name) {
+                MenujuHomepage2View(navController)
+            }
+            composable(ListScreen.MenujuHomepage3View.name) {
+                MenujuHomepage3View(navController)
+            }
+            composable(ListScreen.AppDescView.name) {
+                AppDescView(navController)
+            }
+            composable(ListScreen.HomePage.name) {
+                HomePage(
+                    navController
+                )
+            }
+
         }
     }
 }

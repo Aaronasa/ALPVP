@@ -1,16 +1,16 @@
 package com.example.foodalp.repositories
 
+import android.content.SharedPreferences
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.example.foodalp.models.GeneralResponseModel
-import com.example.foodalp.models.UserResponse
 import com.example.foodalp.services.UserAPIService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import retrofit2.Response
 
+// UserRepository Interface (without constructor)
 interface UserRepository {
     val currentUserToken: Flow<String>
     val currentUsername: Flow<String>
@@ -19,12 +19,19 @@ interface UserRepository {
 
     suspend fun saveUserToken(token: String)
     suspend fun saveUsername(username: String)
+
+    suspend fun saveUserSession(token: String)  // Make this suspend as well if you plan to call it from a coroutine scope
+    suspend fun clearSession()
+    fun isUserLoggedIn(): Boolean
 }
 
+// NetworkUserRepository Implementation
 class NetworkUserRepository(
     private val userDataStore: DataStore<Preferences>,
-    private val userAPIService: UserAPIService
+    private val userAPIService: UserAPIService,
+    private val preferences: SharedPreferences // Pass SharedPreferences to the constructor
 ) : UserRepository {
+
     private companion object {
         val USER_TOKEN = stringPreferencesKey("token")
         val USERNAME = stringPreferencesKey("username")
@@ -49,7 +56,7 @@ class NetworkUserRepository(
 
     // Logs out the user by calling the API and passing the token in the header
     override suspend fun logout(token: String): Response<UserResponse> {
-        return userAPIService.logoutUser(token)  // Use suspend function here
+        return userAPIService.logoutUser(token)
     }
 
     // Saves the username to DataStore
@@ -58,4 +65,25 @@ class NetworkUserRepository(
             preferences[USERNAME] = username
         }
     }
+
+    // Saves the user session token in SharedPreferences (for session management)
+    override suspend fun saveUserSession(token: String) {
+        preferences.edit()
+            .putString("USER_TOKEN", token)
+            .apply()
+    }
+
+    // Clear the user session in SharedPreferences
+    override suspend fun clearSession() {
+        preferences.edit()
+            .remove("USER_TOKEN")
+            .apply()
+    }
+
+    // Check if the user is logged in by checking for a non-null token in SharedPreferences
+    override fun isUserLoggedIn(): Boolean {
+        val token = preferences.getString("USER_TOKEN", null)
+        return !token.isNullOrEmpty()
+    }
 }
+

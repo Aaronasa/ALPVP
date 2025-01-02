@@ -14,6 +14,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -169,6 +170,7 @@ fun RegisterView(navController: NavController, viewModel: UserViewModel = viewMo
                         TextField(
                             value = password,
                             onValueChange = { password = it },
+                            visualTransformation = PasswordVisualTransformation(),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(
@@ -193,9 +195,6 @@ fun RegisterView(navController: NavController, viewModel: UserViewModel = viewMo
                     Spacer(modifier = Modifier.height(25.dp))
                     Button(
                         onClick = {
-                            // Check if data is being passed correctly
-                            Log.d("RegisterView", "Username: $username, Email: $email, Password: $password")
-4
                             // Trigger register action
                             viewModel.registerUser(username, email, password)
                         },
@@ -218,10 +217,26 @@ fun RegisterView(navController: NavController, viewModel: UserViewModel = viewMo
             }
         }
     }
-
-    if (statusState.value is UserStatusUIState.Success) {
-        navController.navigate(ListScreen.Loginview.name) {
-            popUpTo(ListScreen.Registerview.name) { inclusive = true }
+    LaunchedEffect(statusState.value) {
+        when (statusState.value) {
+            is UserStatusUIState.Loading -> {
+                Log.d("RegisterView", "Registration in progress...")
+            }
+            is UserStatusUIState.Error -> {
+            }
+            is UserStatusUIState.Success -> {
+                Log.d("RegisterView", "Registration Successful! Navigating to LoginView.")
+                navController.navigate(ListScreen.Loginview.name) {
+                    // PopUp the RegisterView but prevent the backstack from being re-created
+                    popUpTo(ListScreen.Registerview.name)
+                    launchSingleTop = true // Ensures LoginView is only created once
+                }
+            }
+            UserStatusUIState.Idle -> {
+                Log.d("RegisterView", "Idle state, no action needed.")
+            }
+            else -> {}
         }
     }
 }
+

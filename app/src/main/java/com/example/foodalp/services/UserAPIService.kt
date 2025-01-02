@@ -1,7 +1,6 @@
 package com.example.foodalp.services
 
 import com.example.foodalp.models.GeneralResponseModel
-import com.example.foodalp.models.UserResponse
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Header
