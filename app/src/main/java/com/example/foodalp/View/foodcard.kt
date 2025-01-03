@@ -2,6 +2,7 @@ package com.example.foodalp.View
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,66 +35,55 @@ import java.time.format.TextStyle
 
 
 @Composable
-fun foodcard (){
+fun FoodCard() {
     val customFontFamily = FontFamily(
         Font(R.font.jua)
     )
-    Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFFF5F5F5)),
-    contentAlignment = Alignment.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .width(300.dp)
-                .height(400.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(Color.White)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                // Image section
-                Image(
-                    painter = painterResource(id = R.drawable.asset1), // Replace with your image
-                    contentDescription = "Lake Braise",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp)
-                )
-                // Gradient overlay (optional, for better text contrast)
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp)
-                        .background(
-                            Brush.verticalGradient(
-                                listOf(Color.Transparent, Color.Black),
-                                startY = 0f
-                            )
-                        ),
-                    contentAlignment = Alignment.BottomStart
-                ) {
-//                    Text(
-//                        text = "Lake Braise",
-//                        style = TextStyle(
-//                            color = Color.White,
-//                            fontSize = 24.sp,
-//                            fontWeight = FontWeight.Bold
-//                        ),
-//                        modifier = Modifier.padding(16.dp)
-//                    )
-                }
 
+    Box(
+        modifier = Modifier
+            .padding(16.dp) // Outer padding to separate from screen edges
+            .clip(RoundedCornerShape(16.dp)) // Rounded corners for the card
+            .background(Color.White) // Background color of the card
+            .padding(8.dp) // Padding inside the card for a clean layout
+    ) {
+        Column(
+            modifier = Modifier.size(width = 250.dp, height = 300.dp)
+        ) {
+            // Image section
+            Image(
+                painter = painterResource(id = R.drawable.ic_launcher_background), // Replace with your image
+                contentDescription = "Lake Braise",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(250.dp) // Set height for the image
+                    .clip(RoundedCornerShape(12.dp)) // Rounded corners for the image
+            )
+
+            // Text
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 5.dp, top = 14.dp, end = 5.dp),
+//                verticalArrangement = Arrangement.Center,
+            ) {
+                // Title text
+                Text(
+                    text = "Lake Braise",
+                    color = Color.Black,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = customFontFamily
+                )
             }
         }
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview
 @Composable
-fun preview(){
-    foodcard()
+fun PreviewFoodCard() {
+    FoodCard()
 }
+

@@ -2,6 +2,7 @@ package com.example.foodalp.viewmodels
 
 import LoginRequest
 import RegisterRequest
+import UpdateUserRequest
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.LiveData
