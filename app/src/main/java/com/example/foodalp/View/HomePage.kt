@@ -28,14 +28,30 @@ import com.example.foodalp.R
 import com.example.foodalp.uiStates.UserStatusUIState
 import com.example.foodalp.uiStates.UserUIState
 import com.example.foodalp.viewmodels.UserViewModel
+import android.content.Context
+import android.content.SharedPreferences
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun HomePage(
     navController: NavController,
     userViewModel: UserViewModel = viewModel()
 ) {
-    LaunchedEffect(true) {
-        userViewModel.loadUserData()
+    val context = LocalContext.current  // Get context here
+
+    // Assume that you retrieve the token and email from somewhere (e.g., shared preferences or session storage)
+    val token = getUserToken()  // Replace this with your logic to get the token
+    val email = getUserEmail()  // Replace this with your logic to get the email
+
+    // Check if the token or email is null/empty and handle accordingly
+    if (!token.isNullOrEmpty() && !email.isNullOrEmpty()) {
+        LaunchedEffect(true) {
+            userViewModel.loadUserData(token, email)
+        }
+    } else {
+        // Handle scenario where user is not logged in
+        // Maybe navigate to login page or show error
+        Log.e("HomePage", "User not logged in. Token or email is missing.")
     }
 
     // Observe the user state from the viewModel
@@ -133,13 +149,27 @@ fun HomePage(
                 )
             }
         }
-
         UserUIState.Idle -> {
             // Handle idle state if necessary
         }
     }
 }
 
+// Retrieve token from SharedPreferences
+@Composable
+fun getUserToken(): String? {
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
+    return sharedPreferences.getString("token", null)
+}
+
+// Retrieve email from SharedPreferences
+@Composable
+fun getUserEmail(): String? {
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
+    return sharedPreferences.getString("email", null)
+}
 @Composable
 fun SearchBar() {
     Box(

@@ -1,5 +1,7 @@
 package com.example.foodalp.uiStates
 
+import UserModel
+
 
 sealed class UserUIState {
     object Idle : UserUIState() // Initial state or no actions

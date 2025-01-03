@@ -1,7 +1,7 @@
 // Response model for User-related API calls
-data class UserResponse(
-    val data: UserModel
-)
+//data class UserResponse(
+//    val data: UserModel
+//)
 
 data class UserModel(
     val id: Int,
@@ -12,7 +12,15 @@ data class UserModel(
     val reviews: List<Review>?
 )
 
-data class EmailRequest(val email: String)
+data class UserResponse(
+    val data: UserModel?,  // The user data you need
+    val status: String,    // Optional: status of the response
+    val message: String?   // Optional: error or success message
+)
+
+data class EmailRequest(
+    val email: String
+)
 
 data class Review(
     val id: String,
