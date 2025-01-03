@@ -1,24 +1,15 @@
 package com.example.foodalp.View
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,7 +34,13 @@ fun HomePage(
     navController: NavController,
     userViewModel: UserViewModel = viewModel()
 ) {
+    LaunchedEffect(true) {
+        userViewModel.loadUserData()
+    }
+
+    // Observe the user state from the viewModel
     val userState = userViewModel.userState.observeAsState(UserUIState.Loading)
+    Log.d("HomePage", "Current state: ${userState.value}")
 
     when (val state = userState.value) {
         is UserUIState.Loading -> {
@@ -55,10 +52,11 @@ fun HomePage(
             }
         }
         is UserUIState.Success -> {
-            val user = state.user // Ambil data user dari UserUIState.Success
-            if (user != null) {
-                val username = user.username // Ambil username
-                Column(modifier = Modifier.fillMaxSize()) {
+            val user = state.user
+            user?.let {
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = Color.White)) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -70,11 +68,13 @@ fun HomePage(
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop
                         )
+
                         Column(
                             modifier = Modifier.fillMaxSize(),
                             verticalArrangement = Arrangement.Top,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
+                            // HeaderSection is defined here
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -84,7 +84,7 @@ fun HomePage(
                             ) {
                                 Column {
                                     Text(
-                                        text = "Hi $username", // Gunakan username di sini
+                                        text = "Hi ${it.username}",
                                         fontSize = 24.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = Color(0xFF1B1C21)
@@ -115,53 +115,66 @@ fun HomePage(
                             }
 
                             Spacer(modifier = Modifier.height(20.dp))
-
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 20.dp)
-                                    .height(56.dp)
-                                    .background(
-                                        color = Color.White,
-                                        shape = RoundedCornerShape(12.dp)
-                                    ),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(horizontal = 16.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.baseline_search_24),
-                                        contentDescription = "Search Icon",
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Text(
-                                        text = "Where do you want to go?",
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.Normal,
-                                        color = Color(0xFFB3B3B3)
-                                    )
-                                }
-                            }
+                            SearchBar()
                         }
                     }
                 }
             }
         }
         is UserUIState.Error -> {
-            Text(
-                text = "Error: ${state.message}",
-                color = Color.Red,
-                modifier = Modifier.padding(16.dp)
-            )
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Error: ${state.message}",
+                    color = Color.Red,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
         }
-        else -> {}
+
+        UserUIState.Idle -> {
+            // Handle idle state if necessary
+        }
     }
 }
+
+@Composable
+fun SearchBar() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .height(56.dp)
+            .background(
+                color = Color.White,
+                shape = RoundedCornerShape(12.dp)
+            ),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.baseline_search_24),
+                contentDescription = "Search Icon",
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = "Where do you want to go?",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Normal,
+                color = Color(0xFFB3B3B3)
+            )
+        }
+    }
+}
+
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable

@@ -2,7 +2,7 @@ package com.example.foodalp.viewmodels
 
 import LoginRequest
 import RegisterRequest
-import UpdateUserRequest
+import EmailRequest
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -92,8 +92,12 @@ class UserViewModel : ViewModel() {
 
                             // Check if the user is null
                             if (user != null) {
-                                saveUserSession(token)
-                                _userState.postValue(UserUIState.Success(user))  // User successfully logged in
+                                saveUserSession(
+                                    token,
+                                    email
+                                )
+                                _userState.postValue(UserUIState.Success(user))
+                                Log.d("UserViewModel", "User logged in: $user")// User successfully logged in
                                 _statusState.postValue(UserStatusUIState.Success)
                                 _statusState.value = UserStatusUIState.Success
                             } else {
@@ -171,19 +175,76 @@ class UserViewModel : ViewModel() {
         }
     }
 
-    // Save the token into SharedPreferences
-    private fun saveUserSession(token: String) {
+    fun saveUserSession(token: String, email: String) {
         val editor = AppContainer.sharedPreferences.edit()
         editor.putString("USER_TOKEN", token)
+        editor.putString("USER_EMAIL", email)
         editor.apply()
-        Log.d("UserViewModel", "Token saved: $token")
+        Log.d("UserViewModel", "Token and Email saved: $token, $email")
     }
 
-    // Clear the token from SharedPreferences
-    private fun clearUserSession() {
+    fun clearUserSession() {
         val editor = AppContainer.sharedPreferences.edit()
         editor.remove("USER_TOKEN")
+        editor.remove("USER_EMAIL")
         editor.apply()
-        Log.d("UserViewModel", "Token cleared")
+        Log.d("UserViewModel", "Token and Email cleared")
+    }
+
+    fun loadUserData() {
+        viewModelScope.launch {
+            _statusState.value = UserStatusUIState.Loading
+            try {
+                // Ambil token dan email dari shared preferences
+                val token = AppContainer.sharedPreferences.getString("USER_TOKEN", null)
+                val email = AppContainer.sharedPreferences.getString("USER_EMAIL", null)
+
+                Log.d("UserViewModel", "Loaded Token: $token, Email: $email")
+
+                // Periksa apakah token dan email ada
+                if (!token.isNullOrEmpty() && !email.isNullOrEmpty()) {
+                    // Buat request untuk email
+                    val emailRequest = EmailRequest(email)
+
+                    // Kirim request POST dengan email di body dan token di header
+                    val response = AppContainer.authService.getUserData(
+                        token = token,
+                        emailRequest = emailRequest
+                    )
+
+                    // Tangani respons API di thread utama
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            val userResponse = response.body()
+                            if (userResponse?.data != null) {
+                                _userState.value = UserUIState.Success(userResponse.data)
+                                _statusState.value = UserStatusUIState.Success
+                            } else {
+                                _userState.value = UserUIState.Error("User data is null")
+                                _statusState.value = UserStatusUIState.Error("User data is null")
+                            }
+                        } else {
+                            val errorMessage = "Error: ${response.code()} - ${response.message()}"
+                            Log.e("UserViewModel", errorMessage)
+                            _userState.value = UserUIState.Error(errorMessage)
+                            _statusState.value = UserStatusUIState.Error(errorMessage)
+                        }
+                    }
+                } else {
+                    val errorMessage = "User is not logged in or missing email/token"
+                    Log.e("UserViewModel", errorMessage)
+                    _userState.value = UserUIState.Error(errorMessage)
+                    _statusState.value = UserStatusUIState.Error(errorMessage)
+                }
+            } catch (e: Exception) {
+                val errorMessage = e.localizedMessage ?: "Failed to load user data"
+                Log.e("UserViewModel", "Exception: $errorMessage", e)
+                _userState.value = UserUIState.Error(errorMessage)
+                _statusState.value = UserStatusUIState.Error(errorMessage)
+            }
+        }
     }
 }
+
+
+

@@ -6,6 +6,7 @@ import retrofit2.http.POST
 import retrofit2.Response
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.PUT
 import retrofit2.http.Query
 
@@ -26,5 +27,11 @@ interface AuthenticationAPIService {
     // Delete User
     @DELETE("delete")
     suspend fun deleteUser(@Query("id") id: Int): Response<UserResponse>
+
+    @POST("/auth/read")
+    suspend fun getUserData(
+        @Header("x-API-Token") token: String,
+        @Body emailRequest: EmailRequest
+    ): Response<UserResponse>
 
 }
