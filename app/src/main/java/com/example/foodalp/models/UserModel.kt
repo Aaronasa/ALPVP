@@ -1,6 +1,6 @@
 // Response model for User-related API calls
 data class UserResponse(
-    val data: UserModel // Jika tidak ada data pengguna, maka bisa null
+    val data: UserModel
 )
 
 data class UserModel(
@@ -8,7 +8,16 @@ data class UserModel(
     val username: String,
     val email: String,
     val token: String,
-    val roleId: Int
+    val roleId: Int,
+    val reviews: List<Review>?
+)
+
+data class EmailRequest(val email: String)
+
+data class Review(
+    val id: String,
+    val content: String,
+    val rating: Int
 )
 
 // Role model representing the user's role
