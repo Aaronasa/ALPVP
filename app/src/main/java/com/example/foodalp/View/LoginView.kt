@@ -35,6 +35,9 @@ import com.example.foodalp.R
 import com.example.foodalp.Route.ListScreen
 import com.example.foodalp.viewmodels.UserViewModel
 import com.example.foodalp.uiStates.UserStatusUIState
+import java.time.format.TextStyle
+import androidx.compose.ui.platform.LocalContext
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,11 +48,11 @@ fun LoginView(
     val customFontFamily = FontFamily(
         Font(R.font.jua)
     )
+    val context = LocalContext.current // Ensure context is available
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    // Observe status state
     val statusState = viewModel.statusState.observeAsState(UserStatusUIState.Idle)
 
     Box(modifier = Modifier.fillMaxHeight()) {
@@ -58,12 +61,7 @@ fun LoginView(
                 .fillMaxSize()
                 .background(color = Color.White)
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.group_8),
-                contentDescription = "Background orange",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
+            // Background image and logo setup...
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -86,6 +84,8 @@ fun LoginView(
                     modifier = Modifier.padding(top = 225.dp, start = 28.dp)
                 )
             }
+
+            // Login form
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -109,81 +109,55 @@ fun LoginView(
                         fontFamily = customFontFamily,
                         modifier = Modifier.padding(bottom = 20.dp)
                     )
-                    Column(
+
+                    // Email TextField
+                    TextField(
+                        value = email,
+                        onValueChange = { email = it },
                         modifier = Modifier
                             .fillMaxWidth()
-                    ) {
+                            .background(
+                                color = Color.Black.copy(alpha = 0.2f),
+                                shape = RoundedCornerShape(16.dp)
+                            ),
+                        textStyle = androidx.compose.ui.text.TextStyle(
+                            fontSize = 20.sp,
+                            color = Color.White
+                        ),
+                        singleLine = true
+                    )
 
-                        Text(
-                            text = "Email",
-                            fontSize = 14.sp,
-                            color = Color(0xFFFFFFFF),
-                            fontFamily = customFontFamily,
-                            modifier = Modifier.padding(bottom = 4.dp, start = 5.dp)
-                        )
-                        TextField(
-                            value = email,
-                            onValueChange = { email = it },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(
-                                    color = Color.Black.copy(alpha = 0.2f),
-                                    shape = RoundedCornerShape(16.dp)
-                                ),
-                            colors = TextFieldDefaults.textFieldColors(
-                                containerColor = Color.Transparent,
-                                cursorColor = Color.Black,
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent,
-                                disabledIndicatorColor = Color.Transparent
-                            ),
-                            textStyle = androidx.compose.ui.text.TextStyle(
-                                fontSize = 20.sp,
-                                color = Color.White
-                            ),
-                            singleLine = true
-                        )
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "Password",
-                            fontSize = 14.sp,
-                            color = Color(0xFFFFFFFF),
-                            fontFamily = customFontFamily,
-                            modifier = Modifier.padding(bottom = 4.dp, start = 5.dp)
-                        )
-                        TextField(
-                            value = password,
-                            onValueChange = { password = it },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(
-                                    color = Color(0x33000000),
-                                    shape = RoundedCornerShape(16.dp)
-                                ),
-                            colors = TextFieldDefaults.textFieldColors(
-                                containerColor = Color.Transparent,
-                                cursorColor = Color.Black,
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent,
-                                disabledIndicatorColor = Color.Transparent
+                    // Password TextField
+                    TextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = Color(0x33000000),
+                                shape = RoundedCornerShape(16.dp)
                             ),
-                            textStyle = androidx.compose.ui.text.TextStyle(
-                                fontSize = 20.sp
-                            ),
-                            singleLine = true
-                        )
-                    }
+                        singleLine = true
+                    )
+
                     Spacer(modifier = Modifier.height(25.dp))
 
+                    // Sign In Button
                     Button(
                         onClick = {
-                            viewModel.loginUser(email, password) // Login request
+                            if (email.isNotBlank() && password.isNotBlank()) {
+                                // Pass context to the ViewModel if needed
+                                viewModel.loginUser(email, password, context)
+                            } else {
+                                // Show an error or feedback that fields cannot be empty
+                                Toast.makeText(context, "Email and password are required", Toast.LENGTH_SHORT).show()
+                            }
                         },
                         modifier = Modifier
                             .fillMaxWidth(0.6f)
-                            .padding(bottom = 60.dp)
-                        ,
+                            .padding(bottom = 60.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFFE7C1BF),
                             contentColor = Color(0xFF0C094E)
@@ -197,7 +171,7 @@ fun LoginView(
                         )
                     }
 
-                    // Handle status state (loading, success, error)
+                    // Show loading spinner while logging in
                     when (statusState.value) {
                         is UserStatusUIState.Loading -> {
                             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -205,9 +179,7 @@ fun LoginView(
                         is UserStatusUIState.Success -> {
                             LaunchedEffect(Unit) {
                                 navController.navigate(ListScreen.HomePage.name) {
-                                    popUpTo(ListScreen.Loginview.name) {
-                                        inclusive = true
-                                    }
+                                    popUpTo(ListScreen.Loginview.name) { inclusive = true }
                                 }
                             }
                         }
@@ -215,12 +187,7 @@ fun LoginView(
                             val errorMessage = (statusState.value as UserStatusUIState.Error).message
                             Text(text = "Error: $errorMessage", color = Color.Red)
                         }
-                        UserStatusUIState.Idle -> {
-                            // Maybe show a placeholder or instruction
-                        }
-                        else -> {
-                            // Handle any unexpected state here
-                        }
+                        else -> { /* Idle State */ }
                     }
                 }
             }

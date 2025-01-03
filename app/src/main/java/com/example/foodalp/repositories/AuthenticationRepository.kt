@@ -1,7 +1,9 @@
 package com.example.foodalp.repositories
 
 import LoginRequest
+import LoginResponse
 import RegisterRequest
+import RegisterResponse
 import com.example.foodalp.services.AuthenticationAPIService
 import retrofit2.Response
 
