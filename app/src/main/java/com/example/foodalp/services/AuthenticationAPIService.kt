@@ -28,35 +28,27 @@ interface AuthenticationAPIService {
     @POST("public/login")
     suspend fun loginUser(@Body request: LoginRequest): Response<LoginResponse>
 
-    // Update User
-    @PUT("update")
-    suspend fun updateUser(@Body request: UpdateUserRequest): Response<UserResponse>
-
-    // Delete User
-    @DELETE("delete")
-    suspend fun deleteUser(@Query("id") id: Int): Response<UserResponse>
-
     @POST("/auth/read")
     suspend fun getUserData(
         @Header("x-API-Token") token: String,
         @Body emailRequest: EmailRequest
     ): Response<UserResponse>
 
-    // Function to handle the API response
-    suspend fun fetchUserData(apiService: AuthenticationAPIService, token: String, email: String): UserResponse? {
-        return try {
-            val response = apiService.getUserData(token, EmailRequest(email))
-            if (response.isSuccessful) {
-                response.body() // Return the UserResponse if successful
-            } else {
-                // Log or handle different response codes (e.g., 401, 403, 500)
-                Log.e("API_ERROR", "Error: ${response.code()} - ${response.errorBody()?.string()}")
-                null // Return null in case of failure
-            }
-        } catch (e: Exception) {
-            Log.e("API_ERROR", "Exception: ${e.message}")
-            null // Return null in case of exception
-        }
-    }
+    @POST("/auth/logout")
+    suspend fun logout(
+        @Header("x-API-Token") token: String
+    ): Response<LogoutResponse>
+
+    @PUT("/auth/update")
+    suspend fun updateUser(
+        @Header("x-API-Token") token: String,
+        @Body request: UpdateUserRequest
+    ): Response<UserResponse>
+
+    @DELETE("/auth/delete")
+    suspend fun deleteUser(
+        @Header("x-API-Token") token: String
+    ): Response<DeleteResponse>
+
 
 }

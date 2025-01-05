@@ -3,6 +3,8 @@ package com.example.foodalp
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
@@ -17,9 +19,9 @@ object AppContainer {
 
     private const val BASE_URL = "http://192.168.18.244:3000/" // Ganti dengan URL API Anda yang sebenarnya
 
-    lateinit var sharedPreferences: SharedPreferences
+     lateinit var sharedPreferences: SharedPreferences
 
-    // Inisialisasi SharedPreferences dan DataStore
+    // Initialising SharedPreferences dan DataStore
     fun initialize(context: Context) {
         sharedPreferences = context.getSharedPreferences("user_preferences", Context.MODE_PRIVATE)
     }
@@ -27,38 +29,38 @@ object AppContainer {
     // DataStore untuk preferensi
     val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_data")
 
-    // Menyiapkan HTTP Logging Interceptor
+    // Mendicancy HTTP Logging Interceptor
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
+
+    // Fungsi untuk mengambil token dari SharedPreferences
+    fun getToken(): String? {
+        val token = sharedPreferences.getString("USER_TOKEN", null)
+        return token
+    }
+    fun getUserToken(context: Context): String? {
+        val sharedPreferences = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
+        return sharedPreferences.getString("token", null)
+    }
+
 
     // Membuat OkHttpClient dengan logging dan token handling
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)
         .addInterceptor { chain ->
             val originalRequest = chain.request()
-
-            // Retrieve token from SharedPreferences
-            val token = sharedPreferences.getString("USER_TOKEN", null)
-
-            // Log the token to ensure it's being retrieved
-            Log.d("AppContainer", "Token ditemukan: $token")
-
+            val token = getToken() // Ambil token terbaru dari SharedPreferences
             val requestBuilder = originalRequest.newBuilder()
 
-            // If the token is present, add it twice to the URL parameters
+            // Tambahkan token ke query parameter dan header jika ada
             token?.let {
-                // Add token twice to query parameters
                 val newUrl = originalRequest.url
                     .newBuilder()
-                    .addQueryParameter("token", it) // First token in params
+                    .addQueryParameter("token", it) // Tambahkan token ke query params
                     .build()
-
-                // Apply the new URL to the request
                 requestBuilder.url(newUrl)
-
-                // Optionally, still send the token in the header as x-API-Token
-                requestBuilder.addHeader("x-API-Token", it)
+                requestBuilder.addHeader("x-API-Token", it) // Tambahkan token ke header
             }
 
             val newRequest = requestBuilder.build()
@@ -80,7 +82,4 @@ object AppContainer {
         retrofit.create(AuthenticationAPIService::class.java)
     }
 
-    val userService: UserAPIService by lazy {
-        retrofit.create(UserAPIService::class.java)
-    }
 }

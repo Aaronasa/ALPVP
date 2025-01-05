@@ -30,6 +30,7 @@ import com.example.foodalp.uiStates.UserUIState
 import com.example.foodalp.viewmodels.UserViewModel
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.compose.foundation.clickable
 import androidx.compose.ui.platform.LocalContext
 
 @Composable
@@ -49,8 +50,6 @@ fun HomePage(
             userViewModel.loadUserData(token, email)
         }
     } else {
-        // Handle scenario where user is not logged in
-        // Maybe navigate to login page or show error
         Log.e("HomePage", "User not logged in. Token or email is missing.")
     }
 
@@ -119,6 +118,11 @@ fun HomePage(
                                         .clip(CircleShape)
                                         .background(Color(0xFF991E3D))
                                         .padding(8.dp)
+                                        .clickable() {
+                                            // Navigasi ke UpdateUserView
+                                            navController.navigate("DetailProfileView")
+                                        }
+
                                 ) {
                                     Image(
                                         painter = painterResource(id = R.drawable.ellipse_11),
@@ -131,7 +135,38 @@ fun HomePage(
                             }
 
                             Spacer(modifier = Modifier.height(20.dp))
-                            SearchBar()
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 20.dp)
+                                    .height(56.dp)
+                                    .background(
+                                        color = Color.White,
+                                        shape = RoundedCornerShape(12.dp)
+                                    ),
+                                contentAlignment = Alignment.CenterStart
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(horizontal = 16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.baseline_search_24),
+                                        contentDescription = "Search Icon",
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text(
+                                        text = "Where do you want to go?",
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Normal,
+                                        color = Color(0xFFB3B3B3)
+                                    )
+                                }
+
+                            }
                         }
                     }
                 }
@@ -155,7 +190,6 @@ fun HomePage(
     }
 }
 
-// Retrieve token from SharedPreferences
 @Composable
 fun getUserToken(): String? {
     val context = LocalContext.current
@@ -163,46 +197,11 @@ fun getUserToken(): String? {
     return sharedPreferences.getString("token", null)
 }
 
-// Retrieve email from SharedPreferences
 @Composable
 fun getUserEmail(): String? {
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
     return sharedPreferences.getString("email", null)
-}
-@Composable
-fun SearchBar() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-            .height(56.dp)
-            .background(
-                color = Color.White,
-                shape = RoundedCornerShape(12.dp)
-            ),
-        contentAlignment = Alignment.CenterStart
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.baseline_search_24),
-                contentDescription = "Search Icon",
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                text = "Where do you want to go?",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Normal,
-                color = Color(0xFFB3B3B3)
-            )
-        }
-    }
 }
 
 

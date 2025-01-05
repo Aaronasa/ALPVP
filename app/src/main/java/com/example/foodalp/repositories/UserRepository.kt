@@ -1,6 +1,5 @@
 package com.example.foodalp.repositories
 
-import UserResponse
 import android.content.SharedPreferences
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -9,14 +8,11 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.foodalp.services.UserAPIService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import retrofit2.Response
 
 // UserRepository Interface (without constructor)
 interface UserRepository {
     val currentUserToken: Flow<String>
     val currentUsername: Flow<String>
-
-    suspend fun logout(token: String): Response<UserResponse>  // Use suspend for the logout method
 
     suspend fun saveUserToken(token: String)
     suspend fun saveUsername(username: String)
@@ -29,8 +25,8 @@ interface UserRepository {
 // NetworkUserRepository Implementation
 class NetworkUserRepository(
     private val userDataStore: DataStore<Preferences>,
-    private val userAPIService: UserAPIService,
-    private val preferences: SharedPreferences // Pass SharedPreferences to the constructor
+    userAPIService: UserAPIService,
+    private val preferences: SharedPreferences // Pass SharedPreferences to the constructor){}
 ) : UserRepository {
 
     private companion object {
@@ -53,11 +49,6 @@ class NetworkUserRepository(
         userDataStore.edit { preferences ->
             preferences[USER_TOKEN] = token
         }
-    }
-
-    // Logs out the user by calling the API and passing the token in the header
-    override suspend fun logout(token: String): Response<UserResponse> {
-        return userAPIService.logoutUser(token)
     }
 
     // Saves the username to DataStore
@@ -86,5 +77,6 @@ class NetworkUserRepository(
         val token = preferences.getString("USER_TOKEN", null)
         return !token.isNullOrEmpty()
     }
+
 }
 

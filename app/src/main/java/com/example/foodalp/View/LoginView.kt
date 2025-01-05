@@ -109,37 +109,72 @@ fun LoginView(
                         fontFamily = customFontFamily,
                         modifier = Modifier.padding(bottom = 20.dp)
                     )
-
-                    // Email TextField
+                    Text(
+                        text = "Email",
+                        fontSize = 17.sp,
+                        color = Color(0xFF0F0A3F),
+                        fontFamily = customFontFamily,
+                        modifier = Modifier.padding(bottom = 4.dp, start = 5.dp)
+                    )
                     TextField(
                         value = email,
-                        onValueChange = { email = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                color = Color.Black.copy(alpha = 0.2f),
-                                shape = RoundedCornerShape(16.dp)
-                            ),
-                        textStyle = androidx.compose.ui.text.TextStyle(
-                            fontSize = 20.sp,
-                            color = Color.White
-                        ),
-                        singleLine = true
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Password TextField
-                    TextField(
-                        value = password,
-                        onValueChange = { password = it },
+                        onValueChange =  { email = it },
+                        placeholder = { Text(
+                            text = "Input Email",
+                            color = Color(0x80000000),
+                            fontFamily = customFontFamily
+                        ) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
                                 color = Color(0x33000000),
                                 shape = RoundedCornerShape(16.dp)
                             ),
-                        singleLine = true
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = Color.Transparent,
+                            cursorColor = Color.Black,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent
+                        ),
+                        textStyle = androidx.compose.ui.text.TextStyle(
+                            fontSize = 20.sp
+                        ),singleLine = true
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Password input field
+                    Text(
+                        text = "Password",
+                        fontSize = 17.sp,
+                        color = Color(0xFF0F0A3F),
+                        fontFamily = customFontFamily,
+                        modifier = Modifier.padding(bottom = 4.dp, start = 5.dp)
+                    )
+                    TextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        placeholder = { Text(
+                            text = "Input Password",
+                            color = Color(0x80000000),
+                            fontFamily = customFontFamily
+                        ) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = Color(0x33000000),
+                                shape = RoundedCornerShape(16.dp)
+                            ),
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = Color.Transparent,
+                            cursorColor = Color.Black,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent
+                        ),
+                        textStyle = androidx.compose.ui.text.TextStyle(
+                            fontSize = 20.sp
+                        ),singleLine = true
                     )
 
                     Spacer(modifier = Modifier.height(25.dp))
@@ -178,7 +213,7 @@ fun LoginView(
                         }
                         is UserStatusUIState.Success -> {
                             LaunchedEffect(Unit) {
-                                navController.navigate(ListScreen.HomePage.name) {
+                                navController.navigate(ListScreen.AppDescView.name) {
                                     popUpTo(ListScreen.Loginview.name) { inclusive = true }
                                 }
                             }

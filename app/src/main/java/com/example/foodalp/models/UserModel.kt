@@ -1,7 +1,4 @@
 // Response model for User-related API calls
-//data class UserResponse(
-//    val data: UserModel
-//)
 
 data class UserModel(
     val id: Int,
@@ -28,12 +25,6 @@ data class Review(
     val rating: Int
 )
 
-// Role model representing the user's role
-data class RoleModel(
-    val id: Int,
-    val name: String
-)
-
 // Request model for login
 data class LoginRequest(
     val email: String,
@@ -43,6 +34,14 @@ data class LoginRequest(
 data class LoginResponse(
     val message: String,
     val data: UserModel
+)
+
+data class LogoutResponse(
+    val message: String
+)
+
+data class DeleteResponse(
+    val message: String
 )
 
 // Request model for registration
@@ -58,9 +57,9 @@ data class UpdateUserRequest(
     val email: String
 )
 
-// Request model for deleting a user
-data class DeleteUserRequest(
-    val id: Int
+data class UpdateUserResponse(
+    val message: String,
+    val data: UserModel
 )
 
 // Register response model
