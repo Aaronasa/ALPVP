@@ -36,6 +36,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.foundation.clickable
 import androidx.compose.ui.platform.LocalContext
 import com.example.foodalp.AppContainer
 import com.example.foodalp.Route.ListScreen
@@ -62,8 +63,6 @@ fun HomePage(
             userViewModel.loadUserData(token, email)
         }
     } else {
-        // Handle scenario where user is not logged in
-        // Maybe navigate to login page or show error
         Log.e("HomePage", "User not logged in. Token or email is missing.")
     }
 
@@ -140,6 +139,11 @@ fun HomePage(
                                         .clip(CircleShape)
                                         .background(Color(0xFF991E3D))
                                         .padding(8.dp)
+                                        .clickable() {
+                                            // Navigasi ke UpdateUserView
+                                            navController.navigate("DetailProfileView")
+                                        }
+
                                 ) {
                                     Image(
                                         painter = painterResource(id = R.drawable.ellipse_11),
@@ -178,6 +182,37 @@ fun HomePage(
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C254D))
                             ) {
                                 Text("Add Restaurant", color = Color.White, fontSize = 16.sp)
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 20.dp)
+                                    .height(56.dp)
+                                    .background(
+                                        color = Color.White,
+                                        shape = RoundedCornerShape(12.dp)
+                                    ),
+                                contentAlignment = Alignment.CenterStart
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(horizontal = 16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.baseline_search_24),
+                                        contentDescription = "Search Icon",
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text(
+                                        text = "Where do you want to go?",
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Normal,
+                                        color = Color(0xFFB3B3B3)
+                                    )
+                                }
+
                             }
                         }
                     }
@@ -211,7 +246,6 @@ fun getUserToken(): String? {
     return sharedPreferences.getString("token", null)
 }
 
-// Retrieve email from SharedPreferences
 @Composable
 fun getUserEmail(): String? {
     val context = LocalContext.current

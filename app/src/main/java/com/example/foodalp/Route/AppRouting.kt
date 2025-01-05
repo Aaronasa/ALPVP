@@ -14,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.foodalp.View.AddRestaurantView
 import com.example.foodalp.View.AppDescView
+import com.example.foodalp.View.DetailProfileView
 import com.example.foodalp.View.Launchview
 import com.example.foodalp.View.LoginView
 import com.example.foodalp.View.HomePage
@@ -21,6 +22,7 @@ import com.example.foodalp.View.MenujuHomepage1View
 import com.example.foodalp.View.MenujuHomepage2View
 import com.example.foodalp.View.MenujuHomepage3View
 import com.example.foodalp.View.RegisterView
+import com.example.foodalp.View.UpdateProfileView
 import com.example.foodalp.View.Welcomeview
 import com.example.foodalp.viewmodel.RestaurantViewModel
 import com.example.foodalp.viewmodels.UserViewModel
@@ -36,7 +38,9 @@ enum class ListScreen {
     MenujuHomepage3View,
     AppDescView,
     HomePage,
-    AddRestaurantView
+    AddRestaurantView,
+    UpdateProfileView,
+    DetailProfileView
 }
 
 @Composable
@@ -81,6 +85,11 @@ fun AppRouting() {
             }
             composable(ListScreen.AddRestaurantView.name) {
                 AddRestaurantView(navController)
+            composable(ListScreen.UpdateProfileView.name) {
+                UpdateProfileView(navController)
+            }
+            composable(ListScreen.DetailProfileView.name) {
+                DetailProfileView(navController)
             }
 
         }

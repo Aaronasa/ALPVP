@@ -226,11 +226,9 @@ fun RegisterView(navController: NavController, viewModel: UserViewModel = viewMo
             }
             is UserStatusUIState.Success -> {
                 Log.d("RegisterView", "Registration Successful! Navigating to LoginView.")
-                navController.navigate(ListScreen.Loginview.name) {
-                    // PopUp the RegisterView but prevent the backstack from being re-created
-                    popUpTo(ListScreen.Registerview.name)
-                    launchSingleTop = true // Ensures LoginView is only created once
-                }
+                    navController.navigate(ListScreen.Loginview.name) {
+                        popUpTo(ListScreen.Registerview.name) { inclusive = true }
+                    }
             }
             UserStatusUIState.Idle -> {
                 Log.d("RegisterView", "Idle state, no action needed.")

@@ -4,23 +4,18 @@ import LoginRequest
 import RegisterRequest
 import EmailRequest
 import UpdateUserRequest
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodalp.AppContainer
-import com.example.foodalp.models.*
-import com.example.foodalp.repositories.UserRepository
 import com.example.foodalp.uiStates.UserStatusUIState
 import com.example.foodalp.uiStates.UserUIState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.content.Context
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 
 class UserViewModel : ViewModel() {
 
@@ -35,10 +30,6 @@ class UserViewModel : ViewModel() {
     // API Services from AppContainer
     private val authService = AppContainer.authService
 
-    // Helper function to retrieve the token
-    private fun getUserToken(): String? {
-        return AppContainer.sharedPreferences.getString("USER_TOKEN", null)
-    }
 
     // Register User
     fun registerUser(username: String, email: String, password: String) {
@@ -72,6 +63,38 @@ class UserViewModel : ViewModel() {
             }
         }
     }
+    fun logout(token: String, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Panggil fungsi logout dari service
+                val response = authService.logout(token) // retrofit2.Response<LogoutResponse>
+
+                val result: Result<String> = if (response.isSuccessful) {
+                    // Ambil pesan dari body jika berhasil
+                    val message = response.body()?.message ?: "Logout successful."
+                    Result.success(message)
+                } else {
+                    // Ambil pesan error dari errorBody
+                    val errorMessage = response.errorBody()?.string() ?: "Failed to logout"
+                    Result.failure(Exception(errorMessage))
+                }
+
+                // Kembali ke thread utama
+                withContext(Dispatchers.Main) {
+                    result.fold(
+                        onSuccess = { message -> onSuccess(message) },
+                        onFailure = { error -> onError(error.localizedMessage ?: "An error occurred") }
+                    )
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    onError(e.localizedMessage ?: "An unexpected error occurred")
+                }
+            }
+        }
+    }
+
+
 
     // Login User
     fun loginUser(email: String, password: String, context: Context) {
@@ -130,57 +153,30 @@ class UserViewModel : ViewModel() {
         }
     }
 
-
-
-    // Update User (using token from shared preferences)
-    fun updateUser(request: UpdateUserRequest) {
-        val token = getUserToken()
-        if (token.isNullOrEmpty()) {
-            _statusState.postValue(UserStatusUIState.Error("User not logged in"))
-            return
-        }
-
+    fun updateUser(token: String, username: String, email: String) {
         _statusState.value = UserStatusUIState.Loading
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val response = authService.updateUser(request)
-                if (response.isSuccessful) {
-                    _statusState.postValue(UserStatusUIState.Success)
-                } else {
-                    _statusState.postValue(UserStatusUIState.Error(response.message()))
-                    Log.e("UpdateViewModel", "Error updating user: ${response.message()}")
+                // Prepare the UpdateUserRequest with the new username and email
+                val request = UpdateUserRequest(username, email)  // Only send username and email in the body
+                val response = authService.updateUser(token, request) // Pass token in header
+
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        _statusState.value = UserStatusUIState.Success
+                    } else {
+                        _statusState.value = UserStatusUIState.Error(response.message())
+                    }
                 }
             } catch (e: Exception) {
-                _statusState.postValue(UserStatusUIState.Error(e.localizedMessage ?: "Failed to update user"))
-                Log.e("UpdateViewModel", "Error during update: ${e.localizedMessage}")
+                withContext(Dispatchers.Main) {
+                    _statusState.value = UserStatusUIState.Error(e.localizedMessage ?: "Failed to update user")
+                }
             }
         }
     }
 
-    // Delete User
-    fun deleteUser(id: Int) {
-        val token = getUserToken()
-        if (token.isNullOrEmpty()) {
-            _statusState.postValue(UserStatusUIState.Error("User not logged in"))
-            return
-        }
-
-        _statusState.value = UserStatusUIState.Loading
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val response = authService.deleteUser(id)
-                if (response.isSuccessful) {
-                    _statusState.postValue(UserStatusUIState.Success)
-                } else {
-                    _statusState.postValue(UserStatusUIState.Error(response.message()))
-                    Log.e("DeleteViewModel", "Error deleting user: ${response.message()}")
-                }
-            } catch (e: Exception) {
-                _statusState.postValue(UserStatusUIState.Error(e.localizedMessage ?: "Failed to delete user"))
-                Log.e("DeleteViewModel", "Error during delete: ${e.localizedMessage}")
-            }
-        }
-    }
 
     // Save user session
     // Save session data in SharedPreferences
@@ -190,16 +186,6 @@ class UserViewModel : ViewModel() {
         editor.putString("token", token)
         editor.putString("email", email)
         editor.apply()
-    }
-
-
-    // Clear user session (on logout)
-    fun clearUserSession() {
-        val editor = AppContainer.sharedPreferences.edit()
-        editor.remove("USER_TOKEN")
-        editor.remove("USER_EMAIL")
-        editor.apply()
-        Log.d("UserViewModel", "Token and Email cleared")
     }
 
     // Load User Data (get user information using the token)
@@ -245,6 +231,38 @@ class UserViewModel : ViewModel() {
             }
         }
     }
+
+    fun delete(token: String, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Panggil fungsi logout dari service
+                val response = authService.deleteUser(token) // retrofit2.Response<LogoutResponse>
+
+                val result: Result<String> = if (response.isSuccessful) {
+                    // Ambil pesan dari body jika berhasil
+                    val message = response.body()?.message ?: "Delete successful."
+                    Result.success(message)
+                } else {
+                    // Ambil pesan error dari errorBody
+                    val errorMessage = response.errorBody()?.string() ?: "Failed to Delete"
+                    Result.failure(Exception(errorMessage))
+                }
+
+                // Kembali ke thread utama
+                withContext(Dispatchers.Main) {
+                    result.fold(
+                        onSuccess = { message -> onSuccess(message) },
+                        onFailure = { error -> onError(error.localizedMessage ?: "An error occurred") }
+                    )
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    onError(e.localizedMessage ?: "An unexpected error occurred")
+                }
+            }
+        }
+    }
+
 
 
 
