@@ -7,6 +7,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.foodalp.services.AuthenticationAPIService
+import com.example.foodalp.services.RestaurantAPIService
 import com.example.foodalp.services.UserAPIService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -15,7 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object AppContainer {
 
-    private const val BASE_URL = "http://192.168.18.244:3000/" // Ganti dengan URL API Anda yang sebenarnya
+    private const val BASE_URL = "http://192.168.1.5:3000/" // Ganti dengan URL API Anda yang sebenarnya
 
     lateinit var sharedPreferences: SharedPreferences
 
@@ -82,5 +83,12 @@ object AppContainer {
 
     val userService: UserAPIService by lazy {
         retrofit.create(UserAPIService::class.java)
+    }
+    val restaurantService: RestaurantAPIService by lazy {
+        retrofit.create(RestaurantAPIService::class.java)
+    }
+
+    val reviewService: ReviewAPIService by lazy {
+        retrofit.create(ReviewAPIService::class.java)
     }
 }

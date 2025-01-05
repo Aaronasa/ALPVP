@@ -30,14 +30,27 @@ import com.example.foodalp.uiStates.UserUIState
 import com.example.foodalp.viewmodels.UserViewModel
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import com.example.foodalp.AppContainer
+import com.example.foodalp.Route.ListScreen
+import com.example.foodalp.models.RestaurantModel
+import com.example.foodalp.viewmodel.RestaurantViewModel
 
 @Composable
 fun HomePage(
     navController: NavController,
-    userViewModel: UserViewModel = viewModel()
+    userViewModel: UserViewModel = viewModel(),
+    restaurantViewModel: RestaurantViewModel = viewModel()
 ) {
     val context = LocalContext.current  // Get context here
+//    val restaurantViewModel = RestaurantViewModel()
+    val uiState by restaurantViewModel.uiState.collectAsState()
 
     // Assume that you retrieve the token and email from somewhere (e.g., shared preferences or session storage)
     val token = getUserToken()  // Replace this with your logic to get the token
@@ -57,6 +70,14 @@ fun HomePage(
     // Observe the user state from the viewModel
     val userState = userViewModel.userState.observeAsState(UserUIState.Loading)
     Log.d("HomePage", "Current state: ${userState.value}")
+
+    val restaurantState = restaurantViewModel.uiState.collectAsState()
+
+    LaunchedEffect(true) {
+        if (restaurantState.value.restaurants.isEmpty()) {
+            restaurantViewModel.fetchAllRestaurants()  // Load restaurants if not yet fetched
+        }
+    }
 
     when (val state = userState.value) {
         is UserUIState.Loading -> {
@@ -131,7 +152,33 @@ fun HomePage(
                             }
 
                             Spacer(modifier = Modifier.height(20.dp))
-                            SearchBar()
+//                            when {
+//                                restaurantState.value.isLoading -> {
+//                                    CircularProgressIndicator()  // Show loading while fetching restaurants
+//                                }
+//                                restaurantState.value.restaurants.isEmpty() -> {
+//                                    Text("No restaurants available.")
+//                                }
+//                                else -> {
+//                                    val restaurants = restaurantState.value.restaurants
+//                                    RestaurantGrid(
+//                                        restaurants = restaurants,  // Pass the fetched restaurant data
+//                                        restaurantViewModel = restaurantViewModel
+//                                    )
+//                                }
+//                            }
+
+
+                            Spacer(modifier = Modifier.height(30.dp))  // Space between elements
+                            Button (
+                                onClick = { navController.navigate(ListScreen.AddRestaurantView.name) },
+                                modifier = Modifier
+                                    .fillMaxWidth(0.6f)
+                                    .padding(horizontal = 20.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C254D))
+                            ) {
+                                Text("Add Restaurant", color = Color.White, fontSize = 16.sp)
+                            }
                         }
                     }
                 }
@@ -155,6 +202,7 @@ fun HomePage(
     }
 }
 
+
 // Retrieve token from SharedPreferences
 @Composable
 fun getUserToken(): String? {
@@ -170,6 +218,7 @@ fun getUserEmail(): String? {
     val sharedPreferences = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
     return sharedPreferences.getString("email", null)
 }
+
 @Composable
 fun SearchBar() {
     Box(
@@ -201,6 +250,45 @@ fun SearchBar() {
                 fontWeight = FontWeight.Normal,
                 color = Color(0xFFB3B3B3)
             )
+        }
+    }
+}
+
+@Composable
+fun RestaurantGrid(
+    restaurants: List<RestaurantModel>,
+    restaurantViewModel: RestaurantViewModel,
+    modifier: Modifier = Modifier
+) {
+    // Group restaurants into pairs (two restaurants per row)
+    val restaurantPairs = restaurants.chunked(2)
+
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
+    ) {
+        items(restaurantPairs) { pair ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                pair.forEach { restaurant ->
+                    Log.d("Restaurant Grid", "Restaurant response: $restaurant")
+                    RestaurantCard(
+                        restaurantId = restaurant.id,
+                        viewModel = restaurantViewModel,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(8.dp)
+                    )
+                }
+
+                // Add a spacer if the row has fewer than 2 items
+                if (pair.size < 2) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            }
         }
     }
 }

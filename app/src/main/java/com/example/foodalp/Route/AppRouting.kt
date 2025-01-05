@@ -12,6 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.foodalp.View.AddRestaurantView
 import com.example.foodalp.View.AppDescView
 import com.example.foodalp.View.Launchview
 import com.example.foodalp.View.LoginView
@@ -21,6 +22,7 @@ import com.example.foodalp.View.MenujuHomepage2View
 import com.example.foodalp.View.MenujuHomepage3View
 import com.example.foodalp.View.RegisterView
 import com.example.foodalp.View.Welcomeview
+import com.example.foodalp.viewmodel.RestaurantViewModel
 import com.example.foodalp.viewmodels.UserViewModel
 import kotlinx.coroutines.delay
 
@@ -33,7 +35,8 @@ enum class ListScreen {
     MenujuHomepage2View,
     MenujuHomepage3View,
     AppDescView,
-    HomePage
+    HomePage,
+    AddRestaurantView
 }
 
 @Composable
@@ -75,6 +78,9 @@ fun AppRouting() {
             composable(ListScreen.HomePage.name) {
                 val userViewModel = viewModel<UserViewModel>()
                 HomePage(navController, userViewModel)
+            }
+            composable(ListScreen.AddRestaurantView.name) {
+                AddRestaurantView(navController)
             }
 
         }
