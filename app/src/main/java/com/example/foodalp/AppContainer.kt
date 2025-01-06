@@ -29,7 +29,7 @@ object AppContainer {
     // DataStore untuk preferensi
     val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_data")
 
-    // Mendicancy HTTP Logging Interceptor
+    // HTTP Logging Interceptor
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
@@ -39,6 +39,7 @@ object AppContainer {
         val token = sharedPreferences.getString("USER_TOKEN", null)
         return token
     }
+
     fun getUserToken(context: Context): String? {
         val sharedPreferences = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
         return sharedPreferences.getString("token", null)
