@@ -53,7 +53,7 @@ fun UpdateProfileView(navController: androidx.navigation.NavHostController) {
 
     // Handle Update button click
     val onUpdateClick: () -> Unit = {
-        val token = AppContainer.getToken() // Retrieve the token from SharedPreferences or ViewModel
+        val token = token1 // Retrieve the token from SharedPreferences or ViewModel
         if (!token.isNullOrEmpty()) {
             // Pass token in the header, and send username and email in the body
             userViewModel.updateUser(

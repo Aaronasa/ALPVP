@@ -36,29 +36,22 @@ object AppContainer {
 
     // Fungsi untuk mengambil token dari SharedPreferences
     fun getToken(): String? {
-        val token = sharedPreferences.getString("USER_TOKEN", null)
+        val token = sharedPreferences.getString("user_session", null)
         return token
     }
-
-    fun getUserToken(context: Context): String? {
-        val sharedPreferences = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
-        return sharedPreferences.getString("token", null)
-    }
-
 
     // Membuat OkHttpClient dengan logging dan token handling
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)
         .addInterceptor { chain ->
             val originalRequest = chain.request()
-            val token = getToken() // Ambil token terbaru dari SharedPreferences
+            val token = getToken()// Ambil token terbaru dari SharedPreferences
             val requestBuilder = originalRequest.newBuilder()
 
             // Tambahkan token ke query parameter dan header jika ada
             token?.let {
                 val newUrl = originalRequest.url
                     .newBuilder()
-                    .addQueryParameter("token", it) // Tambahkan token ke query params
                     .build()
                 requestBuilder.url(newUrl)
                 requestBuilder.addHeader("x-API-Token", it) // Tambahkan token ke header
@@ -73,7 +66,7 @@ object AppContainer {
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .client(okHttpClient) // Gunakan OkHttpClient dengan interceptor
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
