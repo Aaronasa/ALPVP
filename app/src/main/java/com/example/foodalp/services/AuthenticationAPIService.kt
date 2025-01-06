@@ -1,9 +1,11 @@
 package com.example.foodalp.services
 
 
+import DeleteResponse
 import EmailRequest
 import LoginRequest
 import LoginResponse
+import LogoutResponse
 import RegisterRequest
 import RegisterResponse
 import UpdateUserRequest
@@ -25,7 +27,7 @@ interface AuthenticationAPIService {
         suspend fun registerUser(@Body request: RegisterRequest): Response<RegisterResponse>
 
     // Login User
-    @POST("public/login")
+    @POST("/public/login")
     suspend fun loginUser(@Body request: LoginRequest): Response<LoginResponse>
 
     @POST("/auth/read")

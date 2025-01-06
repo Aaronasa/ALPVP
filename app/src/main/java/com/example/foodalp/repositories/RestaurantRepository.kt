@@ -11,6 +11,7 @@ import com.example.foodalp.services.RestaurantAPIService
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.HttpException
 import java.io.File
 
 class RestaurantRepository(private val apiService: RestaurantAPIService) {
@@ -29,9 +30,34 @@ class RestaurantRepository(private val apiService: RestaurantAPIService) {
 //            throw e
 //        }
 //    }
-    suspend fun getAllRestaurants(): RestaurantResponse {
-        return apiService.getAllRestaurants()
+suspend fun getAllRestaurants(): RestaurantResponse {
+    try {
+        // Log request details (optional, useful for debugging)
+        Log.d("Repository", "Fetching all restaurants...")
+
+        // Make the API call
+        val response = apiService.getAllRestaurants()
+
+        // Log success response (optional)
+        Log.d("Repository", "Successfully fetched restaurants: ${response.data}")
+
+        return response
+    } catch (e: HttpException) {
+        // Check for specific HTTP status codes
+        if (e.code() == 403) {
+            Log.e("Repository", "403 Forbidden: ${e.response()?.errorBody()?.string()}")
+            throw Exception("Access denied: Please check your authentication or permissions.")
+        } else {
+            Log.e("Repository", "HTTP error: ${e.code()} - ${e.message()}")
+            throw e
+        }
+    } catch (e: Exception) {
+        // Handle general exceptions
+        Log.e("Repository", "Error fetching restaurants: ${e.message}", e)
+        throw e
     }
+}
+
 
     suspend fun getRestaurantById(id: Int): RestaurantModel {
         val response = apiService.getRestaurantById(id)

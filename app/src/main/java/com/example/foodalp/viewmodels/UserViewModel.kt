@@ -3,7 +3,9 @@ package com.example.foodalp.viewmodels
 import LoginRequest
 import RegisterRequest
 import EmailRequest
+import LoginResponse
 import UpdateUserRequest
+import UserModel
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
