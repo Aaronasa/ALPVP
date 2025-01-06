@@ -18,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.content.Context
+import androidx.navigation.NavHostController
 
 class UserViewModel : ViewModel() {
 
@@ -99,7 +100,7 @@ class UserViewModel : ViewModel() {
 
 
     // Login User
-    fun loginUser(email: String, password: String, context: Context) {
+    fun loginUser1(email: String, password: String, context: Context) {
         if (email.isBlank() || password.isBlank()) {
             _statusState.postValue(UserStatusUIState.Error("Email and password are required"))
             return
@@ -154,6 +155,72 @@ class UserViewModel : ViewModel() {
             }
         }
     }
+
+    fun loginUser(email: String, password: String, context: Context, navController: NavHostController) {
+        if (email.isBlank() || password.isBlank()) {
+            _statusState.postValue(UserStatusUIState.Error("Email and password are required"))
+            return
+        }
+
+        _statusState.value = UserStatusUIState.Loading
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val request = LoginRequest(email, password)
+                val response = authService.loginUser(request)
+
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        val loginResponse = response.body()
+
+                        // Log the entire response for debugging
+                        Log.d("LoginResponse", "Response body: $loginResponse")
+
+                        if (loginResponse != null) {
+                            val token = loginResponse.data.token
+                            val user = loginResponse.data
+
+                            if (user != null) {
+                                // Save the token and email in SharedPreferences (or another storage method)
+                                saveUserSession(context, token, email)
+
+                                // Load the user data (optional)
+                                loadUserData(token, email)
+
+                                _userState.postValue(UserUIState.Success(user))
+                                _statusState.postValue(UserStatusUIState.Success)
+
+                                // Check the user role
+                                if (user.roleId == 1) {
+                                    // Navigate to Admin Page if the user is an admin
+                                    navController.navigate("adminPage")
+                                } else {
+                                    // Navigate to Homepage if the user is a regular user
+                                    navController.navigate("homePage")
+                                }
+                                Log.d("UserViewModel", "User logged in: $user")
+                            } else {
+                                _statusState.postValue(UserStatusUIState.Error("User data is null"))
+                                Log.e("LoginViewModel", "Error: User data is null")
+                            }
+                        } else {
+                            _statusState.postValue(UserStatusUIState.Error("Response body is null"))
+                            Log.e("LoginViewModel", "Error: Response body is null")
+                        }
+                    } else {
+                        _statusState.postValue(
+                            UserStatusUIState.Error("Error: ${response.code()}, Message: ${response.message()}")
+                        )
+                        Log.e("LoginViewModel", "Error: ${response.code()} - ${response.message()}")
+                    }
+                }
+            } catch (e: Exception) {
+                _statusState.postValue(UserStatusUIState.Error(e.localizedMessage ?: "Login failed"))
+                Log.e("LoginViewModel", "Error during login: ${e.localizedMessage}")
+            }
+        }
+    }
+
 
     fun updateUser(token: String, username: String, email: String) {
         _statusState.value = UserStatusUIState.Loading

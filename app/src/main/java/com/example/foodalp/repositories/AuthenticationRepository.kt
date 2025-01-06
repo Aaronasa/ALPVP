@@ -11,6 +11,7 @@ import UserResponse
 import android.util.Log
 import com.example.foodalp.services.AuthenticationAPIService
 import retrofit2.Response
+import retrofit2.http.Header
 
 // Interface for AuthenticationRepository
 interface AuthenticationRepository {
@@ -24,6 +25,7 @@ interface AuthenticationRepository {
     suspend fun logout(token: String): Result<String>
     suspend fun delete(token: String): Result<String>
     suspend fun updateUser(token: String, username: String, email: String): Response<UserResponse>
+    suspend fun getalluser(token: String): Response<List<UserModel>>
 }
 
 // Network Authentication Repository implementation
@@ -120,6 +122,14 @@ class NetworkAuthenticationRepository(
             authenticationAPIService.updateUser(token, request)
         } catch (e: Exception) {
             throw Exception("Failed to update user: ${e.localizedMessage}", e)
+        }
+    }
+
+    override suspend fun getalluser(token: String): Response<List<UserModel>> {
+        return try {
+            authenticationAPIService.getAllUsers(token)
+        } catch (e: Exception) {
+            throw Exception("Failed to get all users: ${e.localizedMessage}", e)
         }
     }
 }
