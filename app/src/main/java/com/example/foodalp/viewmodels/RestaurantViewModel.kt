@@ -58,11 +58,12 @@ class RestaurantViewModel() : ViewModel() {
     }
 
     fun fetchRestaurantById(restaurantId: Int, callback: (RestaurantModel?) -> Unit) {
+        Log.d("ViewModel", "Fetching restaurant by id: $restaurantId")
         viewModelScope.launch {
             try {
                 // Test API response directly here
                 val response = repository.getRestaurantById(restaurantId)
-                Log.d("Test", "Response: $response")
+                Log.d("viemodel stlh masuk ke repository", "Response setelah masuk ke repository: $response")
 
                 callback(response) // Pass the response to the callback
             } catch (e: Exception) {
@@ -144,4 +145,11 @@ class RestaurantViewModel() : ViewModel() {
             }
         }
     }
+
+//    fun saveRestaurantID(context: Context, restaurantId: Int) {
+//        val RestauantsharedPreferences = context.getSharedPreferences("restaurant_id", Context.MODE_PRIVATE)
+//        val Restauranteditor = RestauantsharedPreferences.edit()
+//        Restauranteditor.putInt("restaurant_id", restaurantId)
+//        Restauranteditor.apply()
+//    }
 }

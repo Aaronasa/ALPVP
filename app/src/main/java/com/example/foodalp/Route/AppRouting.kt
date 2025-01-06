@@ -85,24 +85,25 @@ fun AppRouting() {
             }
             composable(ListScreen.AddRestaurantView.name) {
                 AddRestaurantView(navController)
-            composable(ListScreen.UpdateProfileView.name) {
-                UpdateProfileView(navController)
-            }
-            composable(ListScreen.DetailProfileView.name) {
-                DetailProfileView(navController)
-            }
+                composable(ListScreen.UpdateProfileView.name) {
+                    UpdateProfileView(navController)
+                }
+                composable(ListScreen.DetailProfileView.name) {
+                    DetailProfileView(navController)
+                }
 
+            }
         }
     }
 }
 
-@Composable
-fun LaunchScreen(navController: NavHostController) {
-    Launchview()
-    LaunchedEffect(Unit) {
-        delay(3000)
-        navController.navigate(ListScreen.Welcomeview.name) {
-            popUpTo(ListScreen.Welcomeview.name) { inclusive = true }
+    @Composable
+    fun LaunchScreen(navController: NavHostController) {
+        Launchview()
+        LaunchedEffect(Unit) {
+            delay(3000)
+            navController.navigate(ListScreen.Welcomeview.name) {
+                popUpTo(ListScreen.Welcomeview.name) { inclusive = true }
+            }
         }
     }
-}

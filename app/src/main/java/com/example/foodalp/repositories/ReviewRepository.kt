@@ -15,11 +15,22 @@ class ReviewRepository(private val apiService: ReviewAPIService) {
 
     suspend fun getReviewsByRestaurant(restaurantId: Int): List<ReviewModel> {
         val response = apiService.getReviewsByRestaurant(restaurantId)
-        return when (val data = response.data) {
-            is List<*> -> data.filterIsInstance<ReviewModel>() // Ensure all items are `ReviewModel`
-            is ReviewModel -> listOf(data) // Wrap a single `ReviewModel` in a list
-            else -> emptyList() // Return empty list if data is null or invalid
+        val data = response.data
+
+        // Safely cast `data` to a list of ReviewModel
+        val listData = data as? List<ReviewModel>
+        if (listData != null) {
+            return listData
         }
+
+        // Safely cast `data` to a single ReviewModel
+        val singleData = data as? ReviewModel
+        if (singleData != null) {
+            return listOf(singleData)
+        }
+
+        // Return an empty list if neither case matches
+        return emptyList()
     }
 
     suspend fun updateReview(id: Int, request: UpdateReviewRequest): ReviewModel {

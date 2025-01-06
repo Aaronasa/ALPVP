@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.foodalp.services.AuthenticationAPIService
 import com.example.foodalp.services.RestaurantAPIService
+import com.example.foodalp.services.ReviewAPIService
 import com.example.foodalp.services.UserAPIService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -33,6 +34,10 @@ object AppContainer {
         level = HttpLoggingInterceptor.Level.BODY
     }
 
+    fun getToken(): String? {
+        val token = sharedPreferences.getString("USER_TOKEN", null)
+        return token
+    }
     // Membuat OkHttpClient dengan logging dan token handling
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)

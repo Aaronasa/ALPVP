@@ -87,12 +87,15 @@ fun HomePage(
                 CircularProgressIndicator()
             }
         }
+
         is UserUIState.Success -> {
             val user = state.user
             user?.let {
-                Column(modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = Color.White)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color = Color.White)
+                ) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -156,86 +159,94 @@ fun HomePage(
                             }
 
                             Spacer(modifier = Modifier.height(20.dp))
-//                            when {
-//                                restaurantState.value.isLoading -> {
-//                                    CircularProgressIndicator()  // Show loading while fetching restaurants
-//                                }
-//                                restaurantState.value.restaurants.isEmpty() -> {
-//                                    Text("No restaurants available.")
-//                                }
-//                                else -> {
-//                                    val restaurants = restaurantState.value.restaurants
-//                                    RestaurantGrid(
-//                                        restaurants = restaurants,  // Pass the fetched restaurant data
-//                                        restaurantViewModel = restaurantViewModel
-//                                    )
-//                                }
-//                            }
+                            when {
+                                restaurantState.value.isLoading -> {
+                                    CircularProgressIndicator()  // Show loading while fetching restaurants
+                                }
+                                restaurantState.value.restaurants.isEmpty() -> {
+                                    Text("No restaurants available.")
+                                }
+                                else -> {
+                                    val restaurants = restaurantState.value.restaurants
+                                    RestaurantGrid(
+                                        restaurants = restaurants,  // Pass the fetched restaurant data
+                                        restaurantViewModel = restaurantViewModel
+                                    )
+                                }
+                            }
 
 
                             Spacer(modifier = Modifier.height(30.dp))  // Space between elements
-                            Button (
+                            Button(
                                 onClick = { navController.navigate(ListScreen.AddRestaurantView.name) },
                                 modifier = Modifier
                                     .fillMaxWidth(0.6f)
                                     .padding(horizontal = 20.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C254D))
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(
+                                        0xFF9C254D
+                                    )
+                                )
                             ) {
                                 Text("Add Restaurant", color = Color.White, fontSize = 16.sp)
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 20.dp)
-                                    .height(56.dp)
-                                    .background(
-                                        color = Color.White,
-                                        shape = RoundedCornerShape(12.dp)
-                                    ),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Row(
+                                Box(
                                     modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(horizontal = 16.dp),
-                                    verticalAlignment = Alignment.CenterVertically
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 20.dp)
+                                        .height(56.dp)
+                                        .background(
+                                            color = Color.White,
+                                            shape = RoundedCornerShape(12.dp)
+                                        ),
+                                    contentAlignment = Alignment.CenterStart
                                 ) {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.baseline_search_24),
-                                        contentDescription = "Search Icon",
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Text(
-                                        text = "Where do you want to go?",
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.Normal,
-                                        color = Color(0xFFB3B3B3)
-                                    )
-                                }
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(horizontal = 16.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.baseline_search_24),
+                                            contentDescription = "Search Icon",
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(12.dp))
+                                        Text(
+                                            text = "Where do you want to go?",
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Normal,
+                                            color = Color(0xFFB3B3B3)
+                                        )
+                                    }
 
+                                }
                             }
                         }
                     }
                 }
             }
         }
-        is UserUIState.Error -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Error: ${state.message}",
-                    color = Color.Red,
-                    modifier = Modifier.padding(16.dp)
-                )
+            is UserUIState.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Error: ${state.message}",
+                        color = Color.Red,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
+            UserUIState.Idle -> {
+                // Handle idle state if necessary
             }
         }
-        UserUIState.Idle -> {
-            // Handle idle state if necessary
-        }
     }
-}
+
+
+
 
 
 // Retrieve token from SharedPreferences
@@ -328,8 +339,8 @@ fun RestaurantGrid(
 }
 
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PreviewHomepage() {
-    HomePage(navController = rememberNavController())
-}
+//@Preview(showBackground = true, showSystemUi = true)
+//@Composable
+//fun PreviewHomepage() {
+//    HomePage(navController = rememberNavController())
+//}
