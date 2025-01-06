@@ -183,8 +183,8 @@ fun LoginView(
                     Button(
                         onClick = {
                             if (email.isNotBlank() && password.isNotBlank()) {
-                                // Pass context to the ViewModel if needed
-                                viewModel.loginUser(email, password, context)
+                                // Pass the context and navController to the ViewModel
+                                viewModel.loginUser(email, password, context, navController)
                             } else {
                                 // Show an error or feedback that fields cannot be empty
                                 Toast.makeText(context, "Email and password are required", Toast.LENGTH_SHORT).show()

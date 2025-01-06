@@ -26,7 +26,7 @@ interface UserRepository {
 class NetworkUserRepository(
     private val userDataStore: DataStore<Preferences>,
     userAPIService: UserAPIService,
-    private val preferences: SharedPreferences // Pass SharedPreferences to the constructor){}
+    private val preferences: SharedPreferences // Pass SharedPreferences to the constructor){}){}
 ) : UserRepository {
 
     private companion object {

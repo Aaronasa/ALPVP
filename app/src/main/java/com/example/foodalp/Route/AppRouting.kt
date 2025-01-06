@@ -12,6 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.foodalp.View.AdminPage
 import com.example.foodalp.View.AppDescView
 import com.example.foodalp.View.DetailProfileView
 import com.example.foodalp.View.Launchview
@@ -37,7 +38,9 @@ enum class ListScreen {
     AppDescView,
     HomePage,
     UpdateProfileView,
-    DetailProfileView
+    DetailProfileView,
+    AdminPage,
+
 }
 
 @Composable
@@ -86,6 +89,10 @@ fun AppRouting() {
             composable(ListScreen.DetailProfileView.name) {
                 DetailProfileView(navController)
             }
+            composable(ListScreen.AdminPage.name) {
+                AdminPage(navController)
+            }
+
 
         }
     }

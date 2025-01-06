@@ -21,12 +21,13 @@ import retrofit2.http.Query
 interface AuthenticationAPIService {
 
     // Create User (Register)
-        @POST("public/create")
-        suspend fun registerUser(@Body request: RegisterRequest): Response<RegisterResponse>
+    @POST("public/create")
+    suspend fun registerUser(@Body request: RegisterRequest
+    ): Response<RegisterResponse>
 
-    // Login User
     @POST("public/login")
-    suspend fun loginUser(@Body request: LoginRequest): Response<LoginResponse>
+    suspend fun loginUser(@Body request: LoginRequest
+    ): Response<LoginResponse>
 
     @POST("/auth/read")
     suspend fun getUserData(
@@ -50,5 +51,9 @@ interface AuthenticationAPIService {
         @Header("x-API-Token") token: String
     ): Response<DeleteResponse>
 
+    @GET("/admin/read")
+    suspend fun getAllUsers(
+        @Header("x-API-Token") token: String
+    ): Response<List<UserModel>>
 
 }
