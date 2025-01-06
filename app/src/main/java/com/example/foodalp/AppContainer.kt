@@ -17,7 +17,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object AppContainer {
 
-    private const val BASE_URL = "http://192.168.1.5:3000/" // Ganti dengan URL API Anda yang sebenarnya
+    private const val BASE_URL = "http://192.168.251.93:3000/" // Ganti dengan URL API Anda yang sebenarnya
 
     lateinit var sharedPreferences: SharedPreferences
 
@@ -30,14 +30,22 @@ object AppContainer {
     val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_data")
 
     // Menyiapkan HTTP Logging Interceptor
+    // HTTP Logging Interceptor
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
 
     fun getToken(): String? {
-        val token = sharedPreferences.getString("USER_TOKEN", null)
+        val token = sharedPreferences.getString("user_session", null)
         return token
     }
+
+    fun getUserToken(context: Context): String? {
+        val sharedPreferences = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
+        return sharedPreferences.getString("token", null)
+    }
+
+
     // Membuat OkHttpClient dengan logging dan token handling
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)
