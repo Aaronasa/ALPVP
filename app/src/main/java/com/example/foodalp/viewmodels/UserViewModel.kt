@@ -3,9 +3,7 @@ package com.example.foodalp.viewmodels
 import LoginRequest
 import RegisterRequest
 import EmailRequest
-import LoginResponse
 import UpdateUserRequest
-import UserModel
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -19,6 +17,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.content.Context
 import androidx.navigation.NavHostController
+import com.example.foodalp.services.AdminAPIService
+import com.example.foodalp.uistates.UserUiStateALL
 
 class UserViewModel : ViewModel() {
 
@@ -98,63 +98,6 @@ class UserViewModel : ViewModel() {
     }
 
 
-
-    // Login User
-    fun loginUser1(email: String, password: String, context: Context) {
-        if (email.isBlank() || password.isBlank()) {
-            _statusState.postValue(UserStatusUIState.Error("Email and password are required"))
-            return
-        }
-
-        _statusState.value = UserStatusUIState.Loading
-
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val request = LoginRequest(email, password)
-                val response = authService.loginUser(request)
-
-                withContext(Dispatchers.Main) {
-                    if (response.isSuccessful) {
-                        val loginResponse = response.body()
-
-                        // Log the entire response for debugging
-                        Log.d("LoginResponse", "Response body: $loginResponse")
-
-                        if (loginResponse != null) {
-                            val token = loginResponse.data.token
-                            val user = loginResponse.data
-
-                            if (user != null) {
-                                // Save the token and email in SharedPreferences (or another storage method)
-                                saveUserSession(context, token, email)
-
-                                // After login, pass both the token and email to loadUserData
-                                loadUserData(token, email)
-
-                                _userState.postValue(UserUIState.Success(user))
-                                _statusState.postValue(UserStatusUIState.Success)
-                                Log.d("UserViewModel", "User logged in: $user")
-                            } else {
-                                _statusState.postValue(UserStatusUIState.Error("User data is null"))
-                                Log.e("LoginViewModel", "Error: User data is null")
-                            }
-                        } else {
-                            _statusState.postValue(UserStatusUIState.Error("Response body is null"))
-                            Log.e("LoginViewModel", "Error: Response body is null")
-                        }
-                    } else {
-                        _statusState.postValue(
-                            UserStatusUIState.Error("Error: ${response.code()}, Message: ${response.message()}")
-                        )
-                        Log.e("LoginViewModel", "Error: ${response.code()} - ${response.message()}")
-                    }
-                }
-            } catch (e: Exception) {
-                _statusState.postValue(UserStatusUIState.Error(e.localizedMessage ?: "Login failed"))
-                Log.e("LoginViewModel", "Error during login: ${e.localizedMessage}")
-            }
-        }
-    }
 
     fun loginUser(email: String, password: String, context: Context, navController: NavHostController) {
         if (email.isBlank() || password.isBlank()) {
@@ -337,6 +280,3 @@ class UserViewModel : ViewModel() {
 
 
 }
-
-
-

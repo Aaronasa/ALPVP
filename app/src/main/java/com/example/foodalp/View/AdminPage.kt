@@ -107,7 +107,7 @@ fun AdminPage(
                                         color = Color(0xFF1B1C21)
                                     )
                                     Text(
-                                        text = "Explore Indonesia!",
+                                        text = "Wellcome To Admin Page",
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Normal,
                                         color = Color(0xFF1B1C21)
@@ -146,7 +146,7 @@ fun AdminPage(
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C254D))
                             ) {
                                 Text(
-                                    "See All User",
+                                    "See City",
                                     color = Color.White,
                                     fontFamily = customFontFamily,
                                     fontSize = 20.sp
