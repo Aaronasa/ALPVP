@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.foodalp.R
-import com.example.foodalp.Route.ListScreen
+import com.example.foodalp.enums.ListScreen
 import com.example.foodalp.viewmodels.UserViewModel
 import com.example.foodalp.uiStates.UserStatusUIState
 import java.time.format.TextStyle

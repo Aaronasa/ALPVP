@@ -16,7 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object AppContainer {
 
-    private const val BASE_URL = "http://192.168.18.244:3000/" // Ganti dengan URL API Anda yang sebenarnya
+    private const val BASE_URL = "http://192.168.198.148:3000/" // Ganti dengan URL API Anda yang sebenarnya
 
      lateinit var sharedPreferences: SharedPreferences
 

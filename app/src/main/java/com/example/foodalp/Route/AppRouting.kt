@@ -24,24 +24,10 @@ import com.example.foodalp.View.MenujuHomepage3View
 import com.example.foodalp.View.RegisterView
 import com.example.foodalp.View.UpdateProfileView
 import com.example.foodalp.View.Welcomeview
+import com.example.foodalp.enums.ListScreen
 import com.example.foodalp.viewmodels.UserViewModel
 import kotlinx.coroutines.delay
 
-enum class ListScreen {
-    Launchview,
-    Welcomeview,
-    Registerview,
-    Loginview,
-    MenujuHomepage1View,
-    MenujuHomepage2View,
-    MenujuHomepage3View,
-    AppDescView,
-    HomePage,
-    UpdateProfileView,
-    DetailProfileView,
-    AdminPage,
-
-}
 
 @Composable
 fun AppRouting() {
