@@ -11,6 +11,7 @@ import com.example.foodalp.models.CreateRestaurantRequest
 import com.example.foodalp.models.RestaurantModel
 import com.example.foodalp.models.UpdateRestaurantRequest
 import com.example.foodalp.repositories.RestaurantRepository
+import com.example.foodalp.services.RestaurantServiceHelper
 import com.example.foodalp.ui.state.RestaurantUIState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,7 +27,7 @@ class RestaurantViewModel() : ViewModel() {
     private val repository = RestaurantRepository(AppContainer.restaurantService)
     private val _uiState = MutableStateFlow(RestaurantUIState())
     val uiState: StateFlow<RestaurantUIState> get() = _uiState
-
+    private val restaurantServiceHelper = RestaurantServiceHelper(AppContainer.restaurantService)
 
     fun fetchAllRestaurants() {
         viewModelScope.launch {
@@ -57,18 +58,17 @@ class RestaurantViewModel() : ViewModel() {
         }
     }
 
-    fun fetchRestaurantById(restaurantId: Int, callback: (RestaurantModel?) -> Unit) {
-        Log.d("ViewModel", "Fetching restaurant by id: $restaurantId")
+    fun fetchRestaurantById(id: Int, onResult: (RestaurantModel?) -> Unit) {
         viewModelScope.launch {
             try {
-                // Test API response directly here
-                val response = repository.getRestaurantById(restaurantId)
-                Log.d("viemodel stlh masuk ke repository", "Response setelah masuk ke repository: $response")
-
-                callback(response) // Pass the response to the callback
+                val restaurant = restaurantServiceHelper.getRestaurantById(id)
+                onResult(restaurant)
+//                Log.d("viemodel stlh masuk ke repository", "Response setelah masuk ke repository: $response")
+//
+//                callback(response) // Pass the response to the callback
             } catch (e: Exception) {
                 Log.e("ViewModel", "Error fetching restaurant by id: ${e.message}", e)
-                callback(null)
+                onResult(null)
             }
         }
     }
