@@ -15,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.foodalp.View.AddRestaurantView
+import com.example.foodalp.View.AddReview
 import com.example.foodalp.View.AdminPage
 import com.example.foodalp.View.AppDescView
 import com.example.foodalp.View.DetailProfileView
@@ -46,7 +47,8 @@ enum class ListScreen {
     UpdateProfileView,
     DetailProfileView,
     AdminPage,
-    UpdateRestaurantView
+    UpdateRestaurantView,
+    AddReview
 
 
 }
@@ -123,6 +125,9 @@ fun AppRouting() {
             }
             composable(ListScreen.AdminPage.name) {
                 AdminPage(navController)
+            }
+            composable(ListScreen.AddReview.name){
+                AddReview(navController)
             }
 
 

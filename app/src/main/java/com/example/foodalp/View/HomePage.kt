@@ -207,6 +207,19 @@ fun HomePage(
                             ) {
                                 Text("Add Restaurant", color = Color.White, fontSize = 16.sp)
                             }
+                            Button(
+                                onClick = { navController.navigate(ListScreen.AddReview.name) },
+                                modifier = Modifier
+                                    .fillMaxWidth(0.6f)
+                                    .padding(horizontal = 20.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(
+                                        0xFF9C254D
+                                    )
+                                )
+                            ) {
+                                Text("Add Review", color = Color.White, fontSize = 16.sp)
+                            }
                             when (UIstate) {
                                 is RestaurantState.Loading -> {
                                     CircularProgressIndicator()  // Show loading while fetching restaurants
