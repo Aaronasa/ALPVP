@@ -30,15 +30,33 @@ import com.example.foodalp.uiStates.UserUIState
 import com.example.foodalp.viewmodels.UserViewModel
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.platform.LocalContext
+import com.example.foodalp.AppContainer
+import com.example.foodalp.Route.ListScreen
+import com.example.foodalp.models.RestaurantModel
+import com.example.foodalp.ui.state.RestaurantState
+import com.example.foodalp.viewmodel.RestaurantViewModel
 
 @Composable
 fun HomePage(
     navController: NavController,
-    userViewModel: UserViewModel = viewModel()
+    userViewModel: UserViewModel = viewModel(),
+    restaurantViewModel: RestaurantViewModel = viewModel()
 ) {
+//    for restaurant
+    val Restaurant by restaurantViewModel.Restaurant.collectAsState()
+    val UIstate by restaurantViewModel.UIstate.collectAsState()
+
     val context = LocalContext.current  // Get context here
+//    val restaurantViewModel = RestaurantViewModel()
+    val uiState by restaurantViewModel.uiState.collectAsState()
 
     // Assume that you retrieve the token and email from somewhere (e.g., shared preferences or session storage)
     val token = getUserToken()  // Replace this with your logic to get the token
@@ -57,6 +75,13 @@ fun HomePage(
     val userState = userViewModel.userState.observeAsState(UserUIState.Loading)
     Log.d("HomePage", "Current state: ${userState.value}")
 
+
+    LaunchedEffect(Unit) {
+        if (token != null) {
+            restaurantViewModel.fetchAllRestaurants(token)
+        }
+    }
+
     when (val state = userState.value) {
         is UserUIState.Loading -> {
             Box(
@@ -66,12 +91,15 @@ fun HomePage(
                 CircularProgressIndicator()
             }
         }
+
         is UserUIState.Success -> {
             val user = state.user
             user?.let {
-                Column(modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = Color.White)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color = Color.White)
+                ) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -165,13 +193,57 @@ fun HomePage(
                                         color = Color(0xFFB3B3B3)
                                     )
                                 }
+                            }
+                            Button(
+                                onClick = { navController.navigate(ListScreen.AddRestaurantView.name) },
+                                modifier = Modifier
+                                    .fillMaxWidth(0.6f)
+                                    .padding(horizontal = 20.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(
+                                        0xFF9C254D
+                                    )
+                                )
+                            ) {
+                                Text("Add Restaurant", color = Color.White, fontSize = 16.sp)
+                            }
+                            when (UIstate) {
+                                is RestaurantState.Loading -> {
+                                    CircularProgressIndicator()  // Show loading while fetching restaurants
+                                }
 
+                                is RestaurantState.Failed -> {
+                                    val errorMessage =
+                                        (UIstate as RestaurantState.Failed).errorMessage
+                                    Text(errorMessage)  // Display the error message
+                                }
+
+                                is RestaurantState.Success -> {
+                                    val restaurants = (UIstate as RestaurantState.Success).data
+                                    if (restaurants.isEmpty()) {
+                                        Text("No restaurants available.")
+                                    } else {
+                                        if (token != null) {
+                                            RestaurantGrid(
+                                                token = token,
+                                                navController = navController,
+                                                restaurants = Restaurant,  // Pass the fetched restaurant data
+                                                restaurantViewModel = restaurantViewModel
+                                            )
+                                        }
+                                    }
+                                }
+
+                                is RestaurantState.Start -> {
+                                    Text("Welcome!")  // Initial state or any placeholder UI
+                                }
                             }
                         }
                     }
                 }
             }
         }
+
         is UserUIState.Error -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -184,12 +256,85 @@ fun HomePage(
                 )
             }
         }
+
         UserUIState.Idle -> {
             // Handle idle state if necessary
         }
     }
 }
 
+
+@Composable
+fun SearchBar() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .height(56.dp)
+            .background(
+                color = Color.White,
+                shape = RoundedCornerShape(12.dp)
+            ),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.baseline_search_24),
+                contentDescription = "Search Icon",
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = "Where do you want to go?",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Normal,
+                color = Color(0xFFB3B3B3)
+            )
+        }
+    }
+}
+
+@Composable
+fun RestaurantGrid(
+    token : String,
+    navController: NavController,
+    restaurants: List<RestaurantModel>,
+    restaurantViewModel: RestaurantViewModel,
+    modifier: Modifier = Modifier
+) {
+    // Group restaurants into pairs (two restaurants per row)
+    val restaurantPairs = restaurants.chunked(1)
+
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
+    ) {
+        items(restaurants) { restaurant ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                RestaurantCard(
+                    onCardClick = {navController?.navigate(ListScreen.UpdateRestaurantView.name + "/${restaurant.id}/${token}")},
+                    navController = navController,
+                    restaurant = restaurant,
+                    viewModel = restaurantViewModel,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(8.dp)
+                )
+            }
+        }
+    }
+}
+
+// Retrieve token from SharedPreferences
 @Composable
 fun getUserToken(): String? {
     val context = LocalContext.current
@@ -205,8 +350,8 @@ fun getUserEmail(): String? {
 }
 
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PreviewHomepage() {
-    HomePage(navController = rememberNavController())
-}
+//@Preview(showBackground = true, showSystemUi = true)
+//@Composable
+//fun PreviewHomepage() {
+//    HomePage(navController = rememberNavController())
+//}
