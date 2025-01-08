@@ -41,6 +41,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.example.foodalp.AppContainer
 import com.example.foodalp.Route.ListScreen
 import com.example.foodalp.models.RestaurantModel
+import com.example.foodalp.ui.state.RestaurantState
 import com.example.foodalp.viewmodel.RestaurantViewModel
 
 @Composable
@@ -49,6 +50,10 @@ fun HomePage(
     userViewModel: UserViewModel = viewModel(),
     restaurantViewModel: RestaurantViewModel = viewModel()
 ) {
+//    for restaurant
+    val Restaurant by restaurantViewModel.Restaurant.collectAsState()
+    val UIstate by restaurantViewModel.UIstate.collectAsState()
+
     val context = LocalContext.current  // Get context here
 //    val restaurantViewModel = RestaurantViewModel()
     val uiState by restaurantViewModel.uiState.collectAsState()
@@ -70,11 +75,10 @@ fun HomePage(
     val userState = userViewModel.userState.observeAsState(UserUIState.Loading)
     Log.d("HomePage", "Current state: ${userState.value}")
 
-    val restaurantState = restaurantViewModel.uiState.collectAsState()
 
-    LaunchedEffect(true) {
-        if (restaurantState.value.restaurants.isEmpty()) {
-            restaurantViewModel.fetchAllRestaurants()  // Load restaurants if not yet fetched
+    LaunchedEffect(Unit) {
+        if (token != null) {
+            restaurantViewModel.fetchAllRestaurants(token)
         }
     }
 
@@ -159,24 +163,37 @@ fun HomePage(
                             }
 
                             Spacer(modifier = Modifier.height(20.dp))
-                            when {
-                                restaurantState.value.isLoading -> {
-                                    CircularProgressIndicator()  // Show loading while fetching restaurants
-                                }
-                                restaurantState.value.restaurants.isEmpty() -> {
-                                    Text("No restaurants available.")
-                                }
-                                else -> {
-                                    val restaurants = restaurantState.value.restaurants
-                                    RestaurantGrid(
-                                        restaurants = restaurants,  // Pass the fetched restaurant data
-                                        restaurantViewModel = restaurantViewModel
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 20.dp)
+                                    .height(56.dp)
+                                    .background(
+                                        color = Color.White,
+                                        shape = RoundedCornerShape(12.dp)
+                                    ),
+                                contentAlignment = Alignment.CenterStart
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(horizontal = 16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.baseline_search_24),
+                                        contentDescription = "Search Icon",
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text(
+                                        text = "Where do you want to go?",
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Normal,
+                                        color = Color(0xFFB3B3B3)
                                     )
                                 }
                             }
-
-
-                            Spacer(modifier = Modifier.height(30.dp))  // Space between elements
                             Button(
                                 onClick = { navController.navigate(ListScreen.AddRestaurantView.name) },
                                 modifier = Modifier
@@ -189,37 +206,36 @@ fun HomePage(
                                 )
                             ) {
                                 Text("Add Restaurant", color = Color.White, fontSize = 16.sp)
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 20.dp)
-                                        .height(56.dp)
-                                        .background(
-                                            color = Color.White,
-                                            shape = RoundedCornerShape(12.dp)
-                                        ),
-                                    contentAlignment = Alignment.CenterStart
-                                ) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .padding(horizontal = 16.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.baseline_search_24),
-                                            contentDescription = "Search Icon",
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(12.dp))
-                                        Text(
-                                            text = "Where do you want to go?",
-                                            fontSize = 14.sp,
-                                            fontWeight = FontWeight.Normal,
-                                            color = Color(0xFFB3B3B3)
-                                        )
-                                    }
+                            }
+                            when (UIstate) {
+                                is RestaurantState.Loading -> {
+                                    CircularProgressIndicator()  // Show loading while fetching restaurants
+                                }
 
+                                is RestaurantState.Failed -> {
+                                    val errorMessage =
+                                        (UIstate as RestaurantState.Failed).errorMessage
+                                    Text(errorMessage)  // Display the error message
+                                }
+
+                                is RestaurantState.Success -> {
+                                    val restaurants = (UIstate as RestaurantState.Success).data
+                                    if (restaurants.isEmpty()) {
+                                        Text("No restaurants available.")
+                                    } else {
+                                        if (token != null) {
+                                            RestaurantGrid(
+                                                token = token,
+                                                navController = navController,
+                                                restaurants = Restaurant,  // Pass the fetched restaurant data
+                                                restaurantViewModel = restaurantViewModel
+                                            )
+                                        }
+                                    }
+                                }
+
+                                is RestaurantState.Start -> {
+                                    Text("Welcome!")  // Initial state or any placeholder UI
                                 }
                             }
                         }
@@ -227,42 +243,26 @@ fun HomePage(
                 }
             }
         }
-            is UserUIState.Error -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Error: ${state.message}",
-                        color = Color.Red,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
-            }
-            UserUIState.Idle -> {
-                // Handle idle state if necessary
+
+        is UserUIState.Error -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Error: ${state.message}",
+                    color = Color.Red,
+                    modifier = Modifier.padding(16.dp)
+                )
             }
         }
+
+        UserUIState.Idle -> {
+            // Handle idle state if necessary
+        }
     }
-
-
-
-
-
-// Retrieve token from SharedPreferences
-@Composable
-fun getUserToken(): String? {
-    val context = LocalContext.current
-    val sharedPreferences = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
-    return sharedPreferences.getString("token", null)
 }
 
-@Composable
-fun getUserEmail(): String? {
-    val context = LocalContext.current
-    val sharedPreferences = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
-    return sharedPreferences.getString("email", null)
-}
 
 @Composable
 fun SearchBar() {
@@ -301,41 +301,52 @@ fun SearchBar() {
 
 @Composable
 fun RestaurantGrid(
+    token : String,
+    navController: NavController,
     restaurants: List<RestaurantModel>,
     restaurantViewModel: RestaurantViewModel,
     modifier: Modifier = Modifier
 ) {
     // Group restaurants into pairs (two restaurants per row)
-    val restaurantPairs = restaurants.chunked(2)
+    val restaurantPairs = restaurants.chunked(1)
 
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
-        items(restaurantPairs) { pair ->
+        items(restaurants) { restaurant ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                pair.forEach { restaurant ->
-                    Log.d("Restaurant Grid", "Restaurant response: $restaurant")
-                    RestaurantCard(
-                        restaurantId = restaurant.id,
-                        viewModel = restaurantViewModel,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(8.dp)
-                    )
-                }
-
-                // Add a spacer if the row has fewer than 2 items
-                if (pair.size < 2) {
-                    Spacer(modifier = Modifier.weight(1f))
-                }
+                RestaurantCard(
+                    onCardClick = {navController?.navigate(ListScreen.UpdateRestaurantView.name + "/${restaurant.id}/${token}")},
+                    navController = navController,
+                    restaurant = restaurant,
+                    viewModel = restaurantViewModel,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(8.dp)
+                )
             }
         }
     }
+}
+
+// Retrieve token from SharedPreferences
+@Composable
+fun getUserToken(): String? {
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
+    return sharedPreferences.getString("token", null)
+}
+
+@Composable
+fun getUserEmail(): String? {
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
+    return sharedPreferences.getString("email", null)
 }
 
 

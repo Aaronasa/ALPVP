@@ -19,6 +19,10 @@
         var image: String
     )
 
+    data class RestaurantById(
+        val data: RestaurantModel
+    )
+
     // Request model for creating a restaurant
     data class CreateRestaurantRequest(
         val name: String,
