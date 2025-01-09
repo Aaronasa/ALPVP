@@ -9,9 +9,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.foodalp.View.AddRestaurantView
 import com.example.foodalp.View.AdminPage
 import com.example.foodalp.View.AppDescView
 import com.example.foodalp.View.DetailProfileView
@@ -23,6 +26,7 @@ import com.example.foodalp.View.MenujuHomepage2View
 import com.example.foodalp.View.MenujuHomepage3View
 import com.example.foodalp.View.RegisterView
 import com.example.foodalp.View.UpdateProfileView
+import com.example.foodalp.View.UpdateRestaurantView
 import com.example.foodalp.View.Welcomeview
 import com.example.foodalp.enums.ListScreen
 import com.example.foodalp.viewmodels.UserViewModel
@@ -77,6 +81,22 @@ fun AppRouting() {
             }
             composable(ListScreen.AdminPage.name) {
                 AdminPage(navController)
+            }
+            composable(ListScreen.AddRestaurantView.name) {
+                AddRestaurantView(navController)
+            }
+            composable(
+                route = ListScreen.UpdateRestaurantView.name + "/{id}/{token}",
+                arguments = listOf(
+                    navArgument("id") { type = NavType.IntType },
+                    navArgument("token") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val restaurantId = backStackEntry.arguments?.getInt("id")
+                val token = backStackEntry.arguments?.getString("token")
+                if (restaurantId != null && token != null) {
+                    UpdateRestaurantView(navController, restaurantId, token)
+                }
             }
 
 

@@ -3,9 +3,7 @@ package com.example.foodalp.viewmodels
 import LoginRequest
 import RegisterRequest
 import EmailRequest
-import LoginResponse
 import UpdateUserRequest
-import UserModel
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,7 +11,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodalp.AppContainer
 import com.example.foodalp.uiStates.UserStatusUIState
-import com.example.foodalp.uiStates.UserUIState
+import com.example.foodalp.uistates.UserUIState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -67,6 +65,7 @@ class UserViewModel : ViewModel() {
             }
         }
     }
+    
     fun logout(token: String, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
