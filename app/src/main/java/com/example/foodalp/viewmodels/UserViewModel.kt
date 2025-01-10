@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodalp.AppContainer
 import com.example.foodalp.uiStates.UserStatusUIState
-import com.example.foodalp.uiStates.UserUIState
+import com.example.foodalp.uistates.UserUIState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -19,6 +19,7 @@ import android.content.Context
 import androidx.navigation.NavHostController
 import com.example.foodalp.services.AdminAPIService
 import com.example.foodalp.uistates.UserUiStateALL
+
 
 class UserViewModel : ViewModel() {
 
@@ -66,11 +67,12 @@ class UserViewModel : ViewModel() {
             }
         }
     }
+    
     fun logout(token: String, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 // Panggil fungsi logout dari service
-                val response = authService.logout(token) // retrofit2.Response<LogoutResponse>
+                val response = authService.logout(token)
 
                 val result: Result<String> = if (response.isSuccessful) {
                     // Ambil pesan dari body jika berhasil
@@ -139,7 +141,7 @@ class UserViewModel : ViewModel() {
                                     navController.navigate("adminPage")
                                 } else {
                                     // Navigate to Homepage if the user is a regular user
-                                    navController.navigate("homePage")
+                                    navController.navigate("AppDescView")
                                 }
                                 Log.d("UserViewModel", "User logged in: $user")
                             } else {

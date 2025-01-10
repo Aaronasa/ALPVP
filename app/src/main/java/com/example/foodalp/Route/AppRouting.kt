@@ -9,9 +9,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.foodalp.View.AddRestaurantView
 import com.example.foodalp.View.AdminPage
 import com.example.foodalp.View.AppDescView
@@ -24,27 +26,12 @@ import com.example.foodalp.View.MenujuHomepage2View
 import com.example.foodalp.View.MenujuHomepage3View
 import com.example.foodalp.View.RegisterView
 import com.example.foodalp.View.UpdateProfileView
+import com.example.foodalp.View.UpdateRestaurantView
 import com.example.foodalp.View.Welcomeview
-import com.example.foodalp.viewmodel.RestaurantViewModel
+import com.example.foodalp.enums.ListScreen
 import com.example.foodalp.viewmodels.UserViewModel
 import kotlinx.coroutines.delay
 
-enum class ListScreen {
-    Launchview,
-    Welcomeview,
-    Registerview,
-    Loginview,
-    MenujuHomepage1View,
-    MenujuHomepage2View,
-    MenujuHomepage3View,
-    AppDescView,
-    HomePage,
-    AddRestaurantView,
-    UpdateProfileView,
-    DetailProfileView,
-    AdminPage,
-
-}
 
 @Composable
 fun AppRouting() {
@@ -86,14 +73,6 @@ fun AppRouting() {
                 val userViewModel = viewModel<UserViewModel>()
                 HomePage(navController, userViewModel)
             }
-            composable(ListScreen.AddRestaurantView.name) {
-                AddRestaurantView(navController)
-                composable(ListScreen.UpdateProfileView.name) {
-                    UpdateProfileView(navController)
-                }
-                composable(ListScreen.DetailProfileView.name) {
-                    DetailProfileView(navController)
-                }
             composable(ListScreen.UpdateProfileView.name) {
                 UpdateProfileView(navController)
             }
@@ -103,20 +82,35 @@ fun AppRouting() {
             composable(ListScreen.AdminPage.name) {
                 AdminPage(navController)
             }
-
-
+            composable(ListScreen.AddRestaurantView.name) {
+                AddRestaurantView(navController)
             }
+            composable(
+                route = ListScreen.UpdateRestaurantView.name + "/{id}/{token}",
+                arguments = listOf(
+                    navArgument("id") { type = NavType.IntType },
+                    navArgument("token") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val restaurantId = backStackEntry.arguments?.getInt("id")
+                val token = backStackEntry.arguments?.getString("token")
+                if (restaurantId != null && token != null) {
+                    UpdateRestaurantView(navController, restaurantId, token)
+                }
+            }
+
+
         }
     }
 }
 
-    @Composable
-    fun LaunchScreen(navController: NavHostController) {
-        Launchview()
-        LaunchedEffect(Unit) {
-            delay(3000)
-            navController.navigate(ListScreen.Welcomeview.name) {
-                popUpTo(ListScreen.Welcomeview.name) { inclusive = true }
-            }
+@Composable
+fun LaunchScreen(navController: NavHostController) {
+    Launchview()
+    LaunchedEffect(Unit) {
+        delay(3000)
+        navController.navigate(ListScreen.Welcomeview.name) {
+            popUpTo(ListScreen.Welcomeview.name) { inclusive = true }
         }
     }
+}

@@ -8,34 +8,40 @@ import com.example.foodalp.models.RestaurantResponse
 import com.example.foodalp.models.UpdateRestaurantRequest
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+//import okhttp3.Response
 import retrofit2.http.*
+import retrofit2.Response
+
 
 interface RestaurantAPIService {
 
-    @POST("restaurants")
-    suspend fun addRestaurant(@Body restaurant: RestaurantModel)
-
-
     @GET("auth/restaurants/read")
-    suspend fun getAllRestaurants(): RestaurantResponse
-
-    @GET("auth/restaurants/read/{id}")
-    suspend fun getRestaurantById(@Path("id") id: Int): RestaurantModel {
-        // Log the incoming ID for debugging
-        Log.d("RestaurantService", "Fetching restaurant with ID: $id")
-
-        // Use AppContainer's restaurantService to make the API call
-        val response = AppContainer.restaurantService.getRestaurantById(id)
-
-        // Log the response data to debug
-        Log.d("RestaurantService", "Received Response: $response")
-
+    suspend fun getAllRestaurants(
+        @Header("x-API-Token") token: String
+    ): RestaurantResponse {
+        Log.d("RestaurantService", "Fetching all restaurants...")
+        val response = AppContainer.restaurantService.getAllRestaurants(token)
+        Log.d("RestaurantService", "Successfully fetched restaurants: ${response.data}")
         return response
     }
+
+    @GET("auth/restaurants/read/{id}")
+    suspend fun getRestaurantById(
+        @Header("x-API-Token") token: String,
+        @Path("id") id: Int
+    ): Response<RestaurantModel>
+//    {
+//        Log.d("RestaurantService", "Fetching restaurant with ID: $id")
+//        val response = AppContainer.restaurantService.getRestaurantById(token, id)
+//        Log.d("RestaurantService", "Received Response: $response")
+//        return response
+
+//    }
 
     @POST("auth/restaurants/create")
     @Multipart
     suspend fun createRestaurant(
+        @Header("x-API-Token") token: String,
         @Part("name") name: RequestBody,
         @Part("address") address: RequestBody,
         @Part("phone") phone: RequestBody,

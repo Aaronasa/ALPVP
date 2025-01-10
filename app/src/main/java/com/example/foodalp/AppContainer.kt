@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.foodalp.services.AuthenticationAPIService
 import com.example.foodalp.services.RestaurantAPIService
+import com.example.foodalp.services.ReviewAPIService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -75,8 +76,12 @@ object AppContainer {
     val authService: AuthenticationAPIService by lazy {
         retrofit.create(AuthenticationAPIService::class.java)
     }
+
     val restaurantService: RestaurantAPIService by lazy {
         retrofit.create(RestaurantAPIService::class.java)
+    }
+    val reviewService: ReviewAPIService by lazy {
+        retrofit.create(ReviewAPIService::class.java)
     }
 
 }

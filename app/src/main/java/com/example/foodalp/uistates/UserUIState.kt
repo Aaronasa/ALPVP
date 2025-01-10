@@ -1,4 +1,4 @@
-package com.example.foodalp.uiStates
+package com.example.foodalp.uistates
 
 import UserModel
 

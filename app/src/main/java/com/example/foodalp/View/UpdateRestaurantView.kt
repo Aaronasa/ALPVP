@@ -1,6 +1,7 @@
 package com.example.foodalp.View
 
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -50,27 +51,44 @@ import com.example.foodalp.R
 fun UpdateRestaurantView(
     navController: NavHostController,
     restaurantId: Int, // The ID of the restaurant to update
-    viewModel: RestaurantViewModel = viewModel()
+    token: String,
+    RestaurantviewModel: RestaurantViewModel = viewModel()
 ) {
+    Log.d("UpdateRestaurantView", "Token: $token")
+    Log.d("UpdateRestaurantView", "Restaurant ID: $restaurantId")
+
+    val Restaurant by RestaurantviewModel.RestaurantById.collectAsState()
+    val UIstate by RestaurantviewModel.UIstate.collectAsState()
+
     // State for form fields
     var restaurantName by remember { mutableStateOf("") }
     var restaurantAddress by remember { mutableStateOf("") }
     var restaurantPhone by remember { mutableStateOf("") }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var isDataLoaded by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by RestaurantviewModel.uiState.collectAsState()
 
-    // Fetch restaurant details when the view is loaded
-    LaunchedEffect(Unit) {
-        viewModel.fetchRestaurantById(restaurantId) { restaurant ->
-            if (restaurant != null) {
-                restaurantName = restaurant.name
-                restaurantAddress = restaurant.address
-                restaurantPhone = restaurant.phone
+    // Load restaurant data
+    LaunchedEffect(restaurantId) {
+        Log.d("UpdateRestaurantView", "Loading restaurant data for ID: $restaurantId")
+        if (!isDataLoaded) {
+            RestaurantviewModel.FetchRestaurantById(
+                token = token, // Replace with actual token logic
+                restaurantId = restaurantId
+            ) { restaurant ->
+                Log.d("UpdateRestaurantView", "Loaded restaurant: $restaurant")
+                restaurant?.let {
+                    restaurantName = it.name
+                    restaurantAddress = it.address
+                    restaurantPhone = it.phone
+                    isDataLoaded = true
+                }
             }
         }
     }
+
 
     // Image picker launcher
     val imagePickerLauncher = rememberLauncherForActivityResult(
@@ -171,14 +189,19 @@ fun UpdateRestaurantView(
             }
 
             Spacer(modifier = Modifier.height(100.dp))
-            Button (
+            Button(
                 onClick = {
                     val name = restaurantName.trim()
                     val address = restaurantAddress.trim()
                     val phone = restaurantPhone.trim()
 
                     if (name.isNotEmpty() && address.isNotEmpty() && phone.isNotEmpty()) {
-                        val imagePart = imageUri?.let { uri -> viewModel.createImagePart(context, uri) }
+                        val imagePart = imageUri?.let { uri ->
+                            RestaurantviewModel.createImagePart(
+                                context,
+                                uri
+                            )
+                        }
 
                         val request = UpdateRestaurantRequest(
                             id = restaurantId,
@@ -188,11 +211,19 @@ fun UpdateRestaurantView(
                             image = imagePart
                         )
 
-                        viewModel.updateRestaurant(request)
-                        Toast.makeText(context, "Restaurant Updated Successfully", Toast.LENGTH_SHORT).show()
+                        RestaurantviewModel.updateRestaurant(
+                            request,
+                            token = token
+                        ) // Replace with actual token logic
+                        Toast.makeText(
+                            context,
+                            "Restaurant Updated Successfully",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         navController.popBackStack()
                     } else {
-                        Toast.makeText(context, "Please fill all the fields!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Please fill all the fields!", Toast.LENGTH_SHORT)
+                            .show()
                     }
                 },
                 modifier = Modifier.fillMaxWidth(0.6f),
@@ -213,3 +244,5 @@ fun UpdateRestaurantView(
         }
     }
 }
+
+

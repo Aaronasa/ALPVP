@@ -2,7 +2,7 @@ package com.example.foodalp.models
 
 // Response model for Review-related API calls
 data class ReviewResponse(
-    val data: ReviewModel? // If no review is found, data can be null
+    val data: List<ReviewModel> // If no review is found, data can be null
 )
 
 // Model for individual reviews

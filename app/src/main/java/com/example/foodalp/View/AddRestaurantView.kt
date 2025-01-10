@@ -44,6 +44,7 @@ fun AddRestaurantView(
     var restaurantAddress by remember { mutableStateOf("") }
     var restaurantPhone by remember { mutableStateOf("") }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
+    val token = getUserToken()
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -164,7 +165,9 @@ fun AddRestaurantView(
                             image = imagePart // Pass MultipartBody.Part
                         )
 
-                        viewModel.createRestaurant(context, request)
+                        if (token != null) {
+                            viewModel.createRestaurant(token, context, request)
+                        }
                         Toast.makeText(
                             navController.context,
                             "Restaurant Created Successfully",
