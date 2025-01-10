@@ -34,6 +34,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
 import com.example.foodalp.enums.ListScreen
 import com.example.foodalp.models.RestaurantModel
 import com.example.foodalp.ui.state.RestaurantState
@@ -46,11 +48,11 @@ fun HomePage(
     restaurantViewModel: RestaurantViewModel = viewModel()
 ) {
 //    for restaurant
-    val Restaurant by restaurantViewModel.Restaurant.collectAsState()
-    val UIstate by restaurantViewModel.UIstate.collectAsState()
+    val Restaurant by restaurantViewModel.restaurants.collectAsState()
+    val UIstate by restaurantViewModel.uiState.collectAsState()
 
     val context = LocalContext.current  // Get context here
-//    val restaurantViewModel = RestaurantViewModel()
+    val restaurantViewModel = RestaurantViewModel()
     val uiState by restaurantViewModel.uiState.collectAsState()
 
     // Assume that you retrieve the token and email from somewhere (e.g., shared preferences or session storage)
@@ -345,8 +347,8 @@ fun getUserEmail(): String? {
 }
 
 
-//@Preview(showBackground = true, showSystemUi = true)
-//@Composable
-//fun PreviewHomepage() {
-//    HomePage(navController = rememberNavController())
-//}
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun PreviewHomepage() {
+    HomePage(navController = rememberNavController())
+}

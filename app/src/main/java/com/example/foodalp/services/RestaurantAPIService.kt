@@ -54,4 +54,5 @@ interface RestaurantAPIService {
 
     @DELETE("auth/restaurants/delete")
     suspend fun deleteRestaurant(@Body id: Int): RestaurantModel
+    fun getRestaurantById(string: kotlin.String)
 }
