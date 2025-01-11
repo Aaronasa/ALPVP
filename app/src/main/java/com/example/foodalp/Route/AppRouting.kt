@@ -73,6 +73,9 @@ fun AppRouting() {
                 val userViewModel = viewModel<UserViewModel>()
                 HomePage(navController, userViewModel)
             }
+            composable("SearchBar") {
+                SearchBar(navController = navController)
+            }
             composable(ListScreen.UpdateProfileView.name) {
                 UpdateProfileView(navController)
             }
