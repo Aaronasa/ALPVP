@@ -15,8 +15,8 @@ import com.example.foodalp.models.RestaurantModel
 import com.example.foodalp.models.RestaurantResponse
 import com.example.foodalp.models.UpdateRestaurantRequest
 import com.example.foodalp.repositories.RestaurantRepository
-import com.example.foodalp.ui.state.RestaurantState
-import com.example.foodalp.ui.state.RestaurantUIState
+import com.example.foodalp.uistates.RestaurantState
+import com.example.foodalp.uistates.RestaurantUIState
 //import com.example.foodalp.uistates.RestaurantByIdState
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.MutableStateFlow

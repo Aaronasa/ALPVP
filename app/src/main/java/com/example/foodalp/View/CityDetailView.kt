@@ -1,0 +1,130 @@
+package com.example.foodalp.View
+
+import android.util.Log
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.foodalp.R
+import com.example.foodalp.uistates.CityState
+import com.example.foodalp.viewmodel.CityViewModel
+
+@Composable
+fun CityDetailView(
+    cityId: Int,
+    token: String,
+    navController: NavController? = null,
+    cityViewModel: CityViewModel = viewModel()
+) {
+    val token1 = getUserToken()
+    // State initialization
+    var isCityDataLoaded by remember { mutableStateOf(false) }
+    var isAttractionsLoaded by remember { mutableStateOf(false) }
+    var cityName by remember { mutableStateOf("") }
+    var cityImage by remember { mutableStateOf("") }
+
+    // Observing city state
+    val cityState = cityViewModel.cityState.observeAsState(CityState.Loading)
+
+    // LaunchedEffect for loading city details
+    LaunchedEffect(cityId) {
+        Log.d("CityDetailView", "Loading city data for ID: $cityId")
+        if (!isCityDataLoaded) {
+            cityViewModel.FetchCityById(
+                token = token1.toString(),
+                cityId = cityId
+            ) { city ->
+                city?.let {
+                    cityName = it.name
+                    cityImage = it.image
+                    isCityDataLoaded = true
+                } ?: Log.e("CityDetailView", "Failed to load city details")
+            }
+        }
+
+        if (!isAttractionsLoaded) {
+            // Assuming you have an AttractionsViewModel (replace with actual logic)
+            // attractionsViewModel.fetchAllAttractions(token)
+            isAttractionsLoaded = true
+        }
+    }
+
+    Log.d("CityDetailView", "Loading city data for ID: $cityName")
+    Log.d("CityDetailView", "Loading city data for ID: $cityImage")
+
+    // Custom font family
+    val customFontFamily = FontFamily(Font(R.font.jua))
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
+        Box {
+            // Background Image
+            Image(
+                painter = painterResource(id = R.drawable.group_8),
+                contentDescription = "Background orange",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+
+            // Text Overlay
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                contentAlignment = Alignment.TopStart
+            ) {
+                Column {
+                    Text(
+                        text = "Location",
+                        color = Color.Gray,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = customFontFamily,
+                        modifier = Modifier.padding(start = 20.dp, top = 20.dp)
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = cityName,
+                        color = Color(0xFF0C094E),
+                        fontSize = 30.sp,
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        modifier = Modifier.padding(start = 15.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+

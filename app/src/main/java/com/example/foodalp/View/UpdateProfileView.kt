@@ -34,7 +34,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.foodalp.AppContainer
 import com.example.foodalp.enums.ListScreen
 import com.example.foodalp.viewmodels.UserViewModel
-import com.example.foodalp.uiStates.UserStatusUIState
+import com.example.foodalp.uistates.UserStatusUIState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
