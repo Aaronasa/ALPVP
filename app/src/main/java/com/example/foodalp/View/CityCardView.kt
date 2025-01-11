@@ -48,6 +48,7 @@ fun CityCard(
     )
 
     val token = getUserToken()
+    val cityId = city.id
 
     // Card Composable
     Card(
@@ -55,8 +56,10 @@ fun CityCard(
             defaultElevation = 6.dp
         ),
         onClick = {
-            navController.navigate(ListScreen.CityDetailView.name + "/${city.id}/${token}")
+//            navController.navigate(ListScreen.CityDetailView.name + "/${city.id}/${token}")
+            navController.navigate(ListScreen.CityDetailView.name + "/${cityId}/${token}")
         },
+
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier
             .size(width = 240.dp, height = 100.dp)

@@ -92,6 +92,7 @@ fun AppRouting() {
                 if (role != null) {
                     AddRestaurantView(navController, role)
                 }
+            }
             composable(ListScreen.UpdateProfileView.name) {
                 UpdateProfileView(navController)
             }
@@ -100,9 +101,6 @@ fun AppRouting() {
             }
             composable(ListScreen.AdminPage.name) {
                 AdminPage(navController)
-            }
-            composable(ListScreen.AddRestaurantView.name) {
-                AddRestaurantView(navController)
             }
             composable(ListScreen.AddCityView.name) {
                 AddCityView(navController)
@@ -124,27 +122,32 @@ fun AppRouting() {
             composable(
                 route = ListScreen.CityDetailView.name + "/{id}/{token}",
                 arguments = listOf(
-                    navArgument("id") { type = NavType.IntType },  // Define the 'id' as an integer type
-                    navArgument("token") { type = NavType.StringType }  // Define the 'token' as a string type
+                    navArgument("id") { type = NavType.IntType },
+                    navArgument("token") { type = NavType.StringType }
                 )
             ) { backStackEntry ->
-                // Retrieve the arguments from the backStackEntry
-                val id = backStackEntry.arguments?.getInt("id") ?: 0  // Default to 0 if id is not found
-                val token = backStackEntry.arguments?.getString("token") ?: ""  // Default to empty string if token is not found
-
-                // Use id and token in your DetailCityView composable
-                CityDetailView(cityId = id, token = token)
+                val cityId = backStackEntry.arguments?.getInt("id")
+                val token = backStackEntry.arguments?.getString("token")
+                if (cityId != null && token != null) {
+                    CityDetailView(cityId, token, navController)
+                }
             }
             composable(
                 route = ListScreen.CityDetailViewAdmin.name + "/{id}/{token}",
                 arguments = listOf(
-                    navArgument("id") { type = NavType.IntType },  // Define the 'id' as an integer type
-                    navArgument("token") { type = NavType.StringType }  // Define the 'token' as a string type
+                    navArgument("id") {
+                        type = NavType.IntType
+                    },  // Define the 'id' as an integer type
+                    navArgument("token") {
+                        type = NavType.StringType
+                    }  // Define the 'token' as a string type
                 )
             ) { backStackEntry ->
                 // Retrieve the arguments from the backStackEntry
-                val id = backStackEntry.arguments?.getInt("id") ?: 0  // Default to 0 if id is not found
-                val token = backStackEntry.arguments?.getString("token") ?: ""  // Default to empty string if token is not found
+                val id = backStackEntry.arguments?.getInt("id")
+                    ?: 0  // Default to 0 if id is not found
+                val token = backStackEntry.arguments?.getString("token")
+                    ?: ""  // Default to empty string if token is not found
 
                 // Use id and token in your DetailCityView composable
                 CityDetailViewAdmin(cityId = id, token = token)
@@ -159,7 +162,7 @@ fun AppRouting() {
                     navArgument("role") { type = NavType.IntType }
                 )
 
-                ){ backStackEntry ->
+            ) { backStackEntry ->
                 val restaurantId = backStackEntry.arguments?.getInt("id")
                 val token = backStackEntry.arguments?.getString("token")
                 val username = backStackEntry.arguments?.getString("username")
@@ -178,14 +181,21 @@ fun AppRouting() {
                     navArgument("userId") { type = NavType.IntType },
                     navArgument("role") { type = NavType.IntType }
                 )
-            ){ backStackEntry ->
+            ) { backStackEntry ->
                 val restaurantId = backStackEntry.arguments?.getInt("id")
                 val token = backStackEntry.arguments?.getString("token")
                 val username = backStackEntry.arguments?.getString("username")
                 val userId = backStackEntry.arguments?.getInt("userId")
                 val role = backStackEntry.arguments?.getInt("role")
                 if (restaurantId != null && token != null && username != null && userId != null && role != null) {
-                    RestaurantDetailView(navController, restaurantId, token, username, userId, role)
+                    RestaurantDetailView(
+                        navController,
+                        restaurantId,
+                        token,
+                        username,
+                        userId,
+                        role
+                    )
                 }
             }
             composable(
@@ -211,6 +221,7 @@ fun AppRouting() {
     }
 }
 
+
 @Composable
 fun LaunchScreen(navController: NavHostController) {
     Launchview()
@@ -221,3 +232,4 @@ fun LaunchScreen(navController: NavHostController) {
         }
     }
 }
+

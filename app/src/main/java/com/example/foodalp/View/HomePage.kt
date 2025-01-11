@@ -56,7 +56,7 @@ fun HomePage(
     navController: NavController,
     userViewModel: UserViewModel = viewModel(),
     restaurantViewModel: RestaurantViewModel = viewModel(),
-    reviewViewModel: ReviewViewModel = viewModel()
+    reviewViewModel: ReviewViewModel = viewModel(),
     cityViewModel: CityViewModel = viewModel()
 ) {
 //    for restaurant
@@ -218,6 +218,8 @@ fun HomePage(
                                 }
                             }
 
+
+                            val role = it.roleId
                             Button(
                                 onClick = { navController.navigate(ListScreen.AddRestaurantView.name + "/${role}") },
                                 modifier = Modifier
@@ -249,7 +251,7 @@ fun HomePage(
                                         Text("No restaurants available.")
                                     } else {
                                         if (token != null) {
-                                            if(it.roleId == 2) {
+                                            Log.d("HomePage", "Role Id: ${it.roleId}")
                                                 RestaurantGrid(
                                                     token = token,
                                                     navController = navController,
@@ -259,54 +261,11 @@ fun HomePage(
                                                     userId = it.id,
                                                     restaurantViewModel = restaurantViewModel
                                                 )
-                                            }else if(it.roleId == 1){
-                                                RestaurantGrid(
-                                                    token = token,
-                                                    navController = navController,
-                                                    restaurants = restoAdmin,  // Pass the fetched restaurant data
-                                                    username = it.username,
-                                                    role = it.roleId,
-                                                    userId = it.id,
-                                                    restaurantViewModel = restaurantViewModel
-                                                )
-                                            }
                                         }
                                     }
                                 }
 
                                 is RestaurantState.Start -> {
-                                    Text("Welcome!")  // Initial state or any placeholder UI
-                                }
-                            }
-                            when (CityUIstate) {
-                                is CityState.Loading -> {
-                                    CircularProgressIndicator()  // Show loading while fetching restaurants
-                                }
-
-                                is CityState.Failed -> {
-                                    val errorMessage =
-                                        (CityUIstate as CityState.Failed).errorMessage
-                                    Text(errorMessage)  // Display the error message
-                                }
-
-                                is CityState.Success -> {
-                                    val cities =
-                                        (CityUIstate as CityState.Success).data
-                                    if (cities.isEmpty()) {
-                                        Text("No cities available.")
-                                    } else {
-                                        if (token != null) {
-                                            CityGrid(
-                                                token = token,
-                                                navController = navController,
-                                                cities = City,  // Pass the fetched restaurant data
-                                                cityViewModel = cityViewModel
-                                            )
-                                        }
-                                    }
-                                }
-
-                                is CityState.Start -> {
                                     Text("Welcome!")  // Initial state or any placeholder UI
                                 }
                             }

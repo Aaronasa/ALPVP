@@ -57,7 +57,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
 import com.example.foodalp.R
-import com.example.foodalp.Route.ListScreen
+import com.example.foodalp.enums.ListScreen
 import com.example.foodalp.models.ReviewModel
 import com.example.foodalp.uistates.ReviewState
 import com.example.foodalp.viewmodel.RestaurantViewModel

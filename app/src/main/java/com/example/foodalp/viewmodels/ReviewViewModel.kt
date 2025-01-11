@@ -7,9 +7,8 @@ import com.example.foodalp.AppContainer
 import com.example.foodalp.models.*
 import com.example.foodalp.repositories.RestaurantRepository
 import com.example.foodalp.repositories.ReviewRepository
-import com.example.foodalp.ui.state.RestaurantUIState
-import com.example.foodalp.ui.state.ReviewUIState
 import com.example.foodalp.uistates.ReviewState
+import com.example.foodalp.uistates.ReviewUIState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
