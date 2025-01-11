@@ -6,8 +6,10 @@ import retrofit2.http.Header
 
 interface AdminAPIService {
 
-    @GET("/admin/read")
-    suspend fun getAllUsers(
-        @Header("x-API-Token") token: String
-    ): Response<List<UserModel>>
+//    @GET("/admin/read")
+//    suspend fun getAllUsers(
+//        @Header("x-API-Token") token: String
+//    ): Response<List<UserModel>>
+//
+//
 }

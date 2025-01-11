@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.foodalp.R
-//import com.example.foodalp.uistates.UserStatusUIState
 import com.example.foodalp.uistates.UserUIState
 import com.example.foodalp.viewmodels.UserViewModel
 import android.content.Context
@@ -34,12 +33,20 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.ui.platform.LocalContext
-import com.example.foodalp.Route.ListScreen
-import com.example.foodalp.models.RestaurantModel
+
+
 import com.example.foodalp.models.ReviewModel
-import com.example.foodalp.ui.state.RestaurantState
 import com.example.foodalp.uistates.ReviewState
+import com.example.foodalp.enums.ListScreen
+import com.example.foodalp.models.CityModel
+import com.example.foodalp.models.RestaurantModel
+import com.example.foodalp.uistates.CityState
+import com.example.foodalp.uistates.RestaurantState
+import com.example.foodalp.viewmodel.CityViewModel
 import com.example.foodalp.viewmodel.RestaurantViewModel
 import com.example.foodalp.viewmodel.ReviewViewModel
 import com.google.gson.Gson
@@ -50,10 +57,13 @@ fun HomePage(
     userViewModel: UserViewModel = viewModel(),
     restaurantViewModel: RestaurantViewModel = viewModel(),
     reviewViewModel: ReviewViewModel = viewModel()
+    cityViewModel: CityViewModel = viewModel()
 ) {
 //    for restaurant
     val Restaurant by restaurantViewModel.Restaurant.collectAsState()
-    val UIstate by restaurantViewModel.UIstate.collectAsState()
+    val City by cityViewModel.City.collectAsState()
+    val RestaurantUIstate by restaurantViewModel.UIstate.collectAsState()
+    val CityUIstate by cityViewModel.UIstate.collectAsState()
 
     val restoAdmin by restaurantViewModel.admin.collectAsState()
 
@@ -92,6 +102,7 @@ fun HomePage(
     LaunchedEffect(Unit) {
         if (token != null) {
             restaurantViewModel.fetchAllRestaurants(token)
+            cityViewModel.fetchAllCities(token)
         }
     }
 
@@ -174,36 +185,39 @@ fun HomePage(
                             }
 
                             Spacer(modifier = Modifier.height(20.dp))
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 20.dp)
-                                    .height(56.dp)
-                                    .background(
-                                        color = Color.White, shape = RoundedCornerShape(12.dp)
-                                    ), contentAlignment = Alignment.CenterStart
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(horizontal = 16.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.baseline_search_24),
-                                        contentDescription = "Search Icon",
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Text(
-                                        text = "Where do you want to go?",
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.Normal,
-                                        color = Color(0xFFB3B3B3)
-                                    )
+                            when (CityUIstate) {
+                                is CityState.Loading -> {
+                                    CircularProgressIndicator()  // Show loading while fetching restaurants
+                                }
+
+                                is CityState.Failed -> {
+                                    val errorMessage =
+                                        (CityUIstate as CityState.Failed).errorMessage
+                                    Text(errorMessage)  // Display the error message
+                                }
+
+                                is CityState.Success -> {
+                                    val cities =
+                                        (CityUIstate as CityState.Success).data
+                                    if (cities.isEmpty()) {
+                                        Text("No cities available.")
+                                    } else {
+                                        if (token != null) {
+                                            CityGrid(
+                                                token = token,
+                                                navController = navController,
+                                                cities = City,  // Pass the fetched restaurant data
+                                                cityViewModel = cityViewModel
+                                            )
+                                        }
+                                    }
+                                }
+
+                                is CityState.Start -> {
+                                    Text("Welcome!")  // Initial state or any placeholder UI
                                 }
                             }
-                            val role = it.roleId
+
                             Button(
                                 onClick = { navController.navigate(ListScreen.AddRestaurantView.name + "/${role}") },
                                 modifier = Modifier
@@ -217,20 +231,20 @@ fun HomePage(
                             ) {
                                 Text("Add Restaurant", color = Color.White, fontSize = 16.sp)
                             }
-
-                            when (UIstate) {
+                            when (RestaurantUIstate) {
                                 is RestaurantState.Loading -> {
                                     CircularProgressIndicator()  // Show loading while fetching restaurants
                                 }
 
                                 is RestaurantState.Failed -> {
                                     val errorMessage =
-                                        (UIstate as RestaurantState.Failed).errorMessage
+                                        (RestaurantUIstate as RestaurantState.Failed).errorMessage
                                     Text(errorMessage)  // Display the error message
                                 }
 
                                 is RestaurantState.Success -> {
-                                    val restaurants = (UIstate as RestaurantState.Success).data
+                                    val restaurants =
+                                        (RestaurantUIstate as RestaurantState.Success).data
                                     if (restaurants.isEmpty()) {
                                         Text("No restaurants available.")
                                     } else {
@@ -264,7 +278,38 @@ fun HomePage(
                                     Text("Welcome!")  // Initial state or any placeholder UI
                                 }
                             }
+                            when (CityUIstate) {
+                                is CityState.Loading -> {
+                                    CircularProgressIndicator()  // Show loading while fetching restaurants
+                                }
 
+                                is CityState.Failed -> {
+                                    val errorMessage =
+                                        (CityUIstate as CityState.Failed).errorMessage
+                                    Text(errorMessage)  // Display the error message
+                                }
+
+                                is CityState.Success -> {
+                                    val cities =
+                                        (CityUIstate as CityState.Success).data
+                                    if (cities.isEmpty()) {
+                                        Text("No cities available.")
+                                    } else {
+                                        if (token != null) {
+                                            CityGrid(
+                                                token = token,
+                                                navController = navController,
+                                                cities = City,  // Pass the fetched restaurant data
+                                                cityViewModel = cityViewModel
+                                            )
+                                        }
+                                    }
+                                }
+
+                                is CityState.Start -> {
+                                    Text("Welcome!")  // Initial state or any placeholder UI
+                                }
+                            }
                         }
                     }
                 }
@@ -285,40 +330,6 @@ fun HomePage(
 
         UserUIState.Idle -> {
             // Handle idle state if necessary
-        }
-    }
-}
-
-
-@Composable
-fun SearchBar() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-            .height(56.dp)
-            .background(
-                color = Color.White, shape = RoundedCornerShape(12.dp)
-            ), contentAlignment = Alignment.CenterStart
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.baseline_search_24),
-                contentDescription = "Search Icon",
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                text = "Where do you want to go?",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Normal,
-                color = Color(0xFFB3B3B3)
-            )
         }
     }
 }
@@ -358,6 +369,32 @@ fun RestaurantGrid(
     }
 }
 
+@Composable
+fun CityGrid(
+    token: String,
+    navController: NavController,
+    cities: List<CityModel>,
+    cityViewModel: CityViewModel,
+    modifier: Modifier = Modifier
+) {
+    LazyRow (
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp) // Spacing between items
+    ) {
+        items(cities) { city ->
+            Log.d("CityGrid1", "Cities: ${cities.size} - $cities")
+            CityCard(
+                navController = navController,
+                city = city,
+                viewModel = cityViewModel,
+                modifier = Modifier
+                    .padding(8.dp)
+            )
+        }
+    }
+}
 
 
 // Retrieve token from SharedPreferences

@@ -1,4 +1,5 @@
-package com.example.foodalp.ui.state
+package com.example.foodalp.uistates
+
 
 import com.example.foodalp.models.RestaurantModel
 

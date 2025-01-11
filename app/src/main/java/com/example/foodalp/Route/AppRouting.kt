@@ -14,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.foodalp.View.AddCityView
 import com.example.foodalp.View.AddRestaurantView
 import com.example.foodalp.View.AddReview
 import com.example.foodalp.View.AdminPage
@@ -22,6 +23,8 @@ import com.example.foodalp.View.DetailProfileView
 import com.example.foodalp.View.Launchview
 import com.example.foodalp.View.LoginView
 import com.example.foodalp.View.HomePage
+import com.example.foodalp.View.CityDetailView
+import com.example.foodalp.View.CityDetailViewAdmin
 import com.example.foodalp.View.MenujuHomepage1View
 import com.example.foodalp.View.MenujuHomepage2View
 import com.example.foodalp.View.MenujuHomepage3View
@@ -33,31 +36,11 @@ import com.example.foodalp.View.UpdateReview
 import com.example.foodalp.View.Welcomeview
 import com.example.foodalp.models.RestaurantModel
 import com.example.foodalp.viewmodel.RestaurantViewModel
+import com.example.foodalp.enums.ListScreen
 import com.example.foodalp.viewmodels.UserViewModel
 import com.google.gson.Gson
 import kotlinx.coroutines.delay
 
-enum class ListScreen {
-    Launchview,
-    Welcomeview,
-    Registerview,
-    Loginview,
-    MenujuHomepage1View,
-    MenujuHomepage2View,
-    MenujuHomepage3View,
-    AppDescView,
-    HomePage,
-    AddRestaurantView,
-    UpdateProfileView,
-    DetailProfileView,
-    AdminPage,
-    UpdateRestaurantView,
-    AddReview,
-    RestaurantDetailView,
-    UpdateReviewView
-
-
-}
 
 @Composable
 fun AppRouting() {
@@ -109,6 +92,20 @@ fun AppRouting() {
                 if (role != null) {
                     AddRestaurantView(navController, role)
                 }
+            composable(ListScreen.UpdateProfileView.name) {
+                UpdateProfileView(navController)
+            }
+            composable(ListScreen.DetailProfileView.name) {
+                DetailProfileView(navController)
+            }
+            composable(ListScreen.AdminPage.name) {
+                AdminPage(navController)
+            }
+            composable(ListScreen.AddRestaurantView.name) {
+                AddRestaurantView(navController)
+            }
+            composable(ListScreen.AddCityView.name) {
+                AddCityView(navController)
             }
             composable(
                 route = ListScreen.UpdateRestaurantView.name + "/{id}/{token}",
@@ -124,20 +121,33 @@ fun AppRouting() {
                     UpdateRestaurantView(navController, restaurantId, token)
                 }
             }
-            composable(ListScreen.UpdateProfileView.name) {
-                UpdateProfileView(navController)
+            composable(
+                route = ListScreen.CityDetailView.name + "/{id}/{token}",
+                arguments = listOf(
+                    navArgument("id") { type = NavType.IntType },  // Define the 'id' as an integer type
+                    navArgument("token") { type = NavType.StringType }  // Define the 'token' as a string type
+                )
+            ) { backStackEntry ->
+                // Retrieve the arguments from the backStackEntry
+                val id = backStackEntry.arguments?.getInt("id") ?: 0  // Default to 0 if id is not found
+                val token = backStackEntry.arguments?.getString("token") ?: ""  // Default to empty string if token is not found
+
+                // Use id and token in your DetailCityView composable
+                CityDetailView(cityId = id, token = token)
             }
-            composable(ListScreen.DetailProfileView.name) {
-                DetailProfileView(navController)
-            }
-            composable(ListScreen.UpdateProfileView.name) {
-                UpdateProfileView(navController)
-            }
-            composable(ListScreen.DetailProfileView.name) {
-                DetailProfileView(navController)
-            }
-            composable(ListScreen.AdminPage.name) {
-                AdminPage(navController)
+            composable(
+                route = ListScreen.CityDetailViewAdmin.name + "/{id}/{token}",
+                arguments = listOf(
+                    navArgument("id") { type = NavType.IntType },  // Define the 'id' as an integer type
+                    navArgument("token") { type = NavType.StringType }  // Define the 'token' as a string type
+                )
+            ) { backStackEntry ->
+                // Retrieve the arguments from the backStackEntry
+                val id = backStackEntry.arguments?.getInt("id") ?: 0  // Default to 0 if id is not found
+                val token = backStackEntry.arguments?.getString("token") ?: ""  // Default to empty string if token is not found
+
+                // Use id and token in your DetailCityView composable
+                CityDetailViewAdmin(cityId = id, token = token)
             }
             composable(
                 route = ListScreen.AddReview.name + "/{id}/{token}/{username}/{userId}/{role}",

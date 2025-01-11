@@ -58,17 +58,7 @@ fun UserCardView() {
                     onClick = { /* Handle Update */ },
                     modifier = Modifier.padding(4.dp)
                 ) {
-                    Text("Update")
-                }
-
-                // Delete Button
-                Button(
-                    onClick = { /* Handle Delete */ },
-                    modifier = Modifier
-                        .padding(4.dp)
-
-                ) {
-                    Text("Delete")
+                    Text("See Detail")
                 }
             }
         }

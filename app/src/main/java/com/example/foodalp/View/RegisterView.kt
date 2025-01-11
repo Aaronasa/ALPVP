@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.foodalp.R
-import com.example.foodalp.Route.ListScreen
+import com.example.foodalp.enums.ListScreen
 import com.example.foodalp.uistates.UserStatusUIState
 import com.example.foodalp.viewmodels.UserViewModel
 

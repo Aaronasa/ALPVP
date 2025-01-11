@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.foodalp.R
-import com.example.foodalp.Route.ListScreen
+import com.example.foodalp.enums.ListScreen
 
 val customFontFamily = FontFamily(
     Font(R.font.jua)

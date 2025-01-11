@@ -1,5 +1,6 @@
 package com.example.foodalp.uistates
 
+
 sealed class UserStatusUIState {
     object Idle : UserStatusUIState() // Initial state or no actions
     object Loading : UserStatusUIState() // When an action is in progress

@@ -49,7 +49,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.example.foodalp.AppContainer
-import com.example.foodalp.Route.ListScreen
+import com.example.foodalp.enums.ListScreen
 
 @Composable
 fun RestaurantCard(

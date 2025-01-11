@@ -57,6 +57,9 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
     implementation("io.coil-kt:coil-compose:2.4.0")
     implementation ("androidx.compose.material3:material3:1.2.0")
+    implementation ("com.squareup.moshi:moshi:1.12.0")  // or latest version
+    implementation ("com.squareup.moshi:moshi-kotlin:1.12.0")  // for Kotlin support
+    implementation ("com.squareup.moshi:moshi-adapters:1.12.0") // for additional adapters (optional)
 
     implementation ("androidx.activity:activity-compose:1.3.1")
     implementation ("androidx.compose.foundation:foundation:1.0.1")

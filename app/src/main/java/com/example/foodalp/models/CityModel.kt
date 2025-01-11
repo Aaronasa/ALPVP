@@ -1,8 +1,13 @@
 package com.example.foodalp.models
 
+import android.net.Uri
+import okhttp3.MultipartBody
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
+
 // Response model for City-related API calls
 data class CityResponse(
-    val data: CityModel? // If no city is found, data can be null
+    val data: List<CityModel> // If no city is found, data can be null
 )
 
 // Model for individual cities
@@ -15,7 +20,7 @@ data class CityModel(
 // Request model for creating a city
 data class CreateCityRequest(
     val name: String,
-    val image: String
+    val image: MultipartBody.Part?
 )
 
 // Request model for updating a city
