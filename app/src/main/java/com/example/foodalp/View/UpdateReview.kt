@@ -1,5 +1,6 @@
 package com.example.foodalp.View
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -24,22 +25,71 @@ import com.example.foodalp.R
 import com.example.foodalp.models.CreateReviewRequest
 import com.example.foodalp.viewmodel.ReviewViewModel
 import android.widget.Toast
+import com.example.foodalp.models.UpdateReviewRequest
 
 @Composable
-fun AddReview(
+fun UpdateReview(
     navController: NavHostController,
-    restaurantId: Int,
+    reviewId: Int,
     token: String,
     username: String,
-    userId: Int,
     role: Int,
+//    userId: Int,
     ReviewViewModel: ReviewViewModel = viewModel(),
 ) {
     val customFontFamily = FontFamily(Font(R.font.jua))
+
+
     var reviewText by remember { mutableStateOf("") }
     var ratingInput by remember { mutableStateOf("") } // State for user rating input
     val token = getUserToken()
+    var isDataLoaded by remember { mutableStateOf(false) }
     val uiState by ReviewViewModel.uiState.collectAsState()
+
+    if(role == 2) {
+        LaunchedEffect(reviewId) {
+            Log.d("UpdateRestaurantView", "Loading restaurant data for ID: $reviewId")
+            if (!isDataLoaded) {
+                Log.d("UpdateRestaurantView", "Check load data => id: $reviewId dan token: $token")
+                if (token != null) {
+                    ReviewViewModel.fetchReviewById(
+                        token = token, // Replace with actual token logic
+                        reviewId = reviewId
+                    ) { review ->
+                        Log.d("UpdateRestaurantView", "Loaded restaurant: $review")
+                        review?.let {
+                            reviewText = it.content
+                            ratingInput = it.rating.toString()
+                            isDataLoaded = true
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else if (role == 1){
+        LaunchedEffect(reviewId) {
+            Log.d("UpdateRestaurantView", "Loading restaurant data for ID: $reviewId")
+            if (!isDataLoaded) {
+                Log.d("UpdateRestaurantView", "Check load data => id: $reviewId dan token: $token")
+                if (token != null) {
+                    ReviewViewModel.fetchReviewByIdAdmin(
+                        token = token, // Replace with actual token logic
+                        reviewId = reviewId
+                    ) { review ->
+                        Log.d("UpdateRestaurantView", "Loaded restaurant: $review")
+                        review?.let {
+                            reviewText = it.content
+                            ratingInput = it.rating.toString()
+                            isDataLoaded = true
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -53,8 +103,7 @@ fun AddReview(
         )
 
         Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Top Background Shape
             Box(
@@ -64,8 +113,7 @@ fun AddReview(
                     .background(
                         Color(0xFF991E3D),
                         shape = RoundedCornerShape(bottomEnd = 16.dp, bottomStart = 16.dp)
-                    ),
-                contentAlignment = Alignment.Center
+                    ), contentAlignment = Alignment.Center
             ) {
                 Text(
                     "Add Review",
@@ -131,29 +179,19 @@ fun AddReview(
                     // Validate input
                     if (content.isNotEmpty() && rating != null && rating in 1..5) {
 
-                        val userId = userId; // Replace with actual user ID logic
-                        val restaurantId = restaurantId;// Replace with actual restaurant ID logic
+
                         val content = content;
                         val rating = rating.toInt();
 
-
                         if (token != null) {
                             if(role == 2) {
-                                ReviewViewModel.createReview(
-                                    token,
-                                    userId,
-                                    restaurantId,
-                                    content,
-                                    rating
+                                ReviewViewModel.updateReview(
+                                    token, reviewId, content, rating
                                 )
                             }
-                            else if (role == 1){
-                                ReviewViewModel.createReviewAdmin(
-                                    token,
-                                    userId,
-                                    restaurantId,
-                                    content,
-                                    rating
+                            else if (role == 2){
+                                ReviewViewModel.updateReviewAdmin(
+                                    token, reviewId, content, rating
                                 )
                             }
                         }
@@ -176,9 +214,7 @@ fun AddReview(
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C254D))
             ) {
                 Text(
-                    "Submit",
-                    color = Color.White,
-                    fontSize = 20.sp
+                    "Submit", color = Color.White, fontSize = 20.sp
                 )
             }
             if (uiState.isLoading) {
@@ -191,8 +227,3 @@ fun AddReview(
     }
 }
 
-//@Preview(showBackground = true, showSystemUi = true)
-//@Composable
-//fun PreviewAddReview() {
-//    AddReview()
-//}

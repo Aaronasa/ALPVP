@@ -26,11 +26,15 @@ import com.example.foodalp.View.MenujuHomepage1View
 import com.example.foodalp.View.MenujuHomepage2View
 import com.example.foodalp.View.MenujuHomepage3View
 import com.example.foodalp.View.RegisterView
+import com.example.foodalp.View.RestaurantDetailView
 import com.example.foodalp.View.UpdateProfileView
 import com.example.foodalp.View.UpdateRestaurantView
+import com.example.foodalp.View.UpdateReview
 import com.example.foodalp.View.Welcomeview
+import com.example.foodalp.models.RestaurantModel
 import com.example.foodalp.viewmodel.RestaurantViewModel
 import com.example.foodalp.viewmodels.UserViewModel
+import com.google.gson.Gson
 import kotlinx.coroutines.delay
 
 enum class ListScreen {
@@ -48,7 +52,9 @@ enum class ListScreen {
     DetailProfileView,
     AdminPage,
     UpdateRestaurantView,
-    AddReview
+    AddReview,
+    RestaurantDetailView,
+    UpdateReviewView
 
 
 }
@@ -93,24 +99,31 @@ fun AppRouting() {
                 val userViewModel = viewModel<UserViewModel>()
                 HomePage(navController, userViewModel)
             }
-            composable(ListScreen.AddRestaurantView.name) {
-                AddRestaurantView(navController)
+            composable(
+                route = ListScreen.AddRestaurantView.name + "/{role}",
+                arguments = listOf(
+                    navArgument("role") { type = NavType.IntType }
+                )
+            ) { backStackEntry ->
+                val role = backStackEntry.arguments?.getInt("role")
+                if (role != null) {
+                    AddRestaurantView(navController, role)
+                }
             }
             composable(
                 route = ListScreen.UpdateRestaurantView.name + "/{id}/{token}",
                 arguments = listOf(
                     navArgument("id") { type = NavType.IntType },
-                    navArgument("token") { type = NavType.StringType }
+                    navArgument("token") { type = NavType.StringType },
                 )
             ) { backStackEntry ->
                 val restaurantId = backStackEntry.arguments?.getInt("id")
                 val token = backStackEntry.arguments?.getString("token")
+
                 if (restaurantId != null && token != null) {
                     UpdateRestaurantView(navController, restaurantId, token)
                 }
             }
-//                UpdateRestaurantView(navController)
-
             composable(ListScreen.UpdateProfileView.name) {
                 UpdateProfileView(navController)
             }
@@ -126,8 +139,61 @@ fun AppRouting() {
             composable(ListScreen.AdminPage.name) {
                 AdminPage(navController)
             }
-            composable(ListScreen.AddReview.name){
-                AddReview(navController)
+            composable(
+                route = ListScreen.AddReview.name + "/{id}/{token}/{username}/{userId}/{role}",
+                arguments = listOf(
+                    navArgument("id") { type = NavType.IntType },
+                    navArgument("token") { type = NavType.StringType },
+                    navArgument("username") { type = NavType.StringType },
+                    navArgument("userId") { type = NavType.IntType },
+                    navArgument("role") { type = NavType.IntType }
+                )
+
+                ){ backStackEntry ->
+                val restaurantId = backStackEntry.arguments?.getInt("id")
+                val token = backStackEntry.arguments?.getString("token")
+                val username = backStackEntry.arguments?.getString("username")
+                val userId = backStackEntry.arguments?.getInt("userId")
+                val role = backStackEntry.arguments?.getInt("role")
+                if (restaurantId != null && token != null && username != null && userId != null && role != null) {
+                    AddReview(navController, restaurantId, token, username, userId, role)
+                }
+            }
+            composable(
+                route = ListScreen.RestaurantDetailView.name + "/{id}/{token}/{username}/{userId}/{role}",
+                arguments = listOf(
+                    navArgument("id") { type = NavType.IntType },
+                    navArgument("token") { type = NavType.StringType },
+                    navArgument("username") { type = NavType.StringType },
+                    navArgument("userId") { type = NavType.IntType },
+                    navArgument("role") { type = NavType.IntType }
+                )
+            ){ backStackEntry ->
+                val restaurantId = backStackEntry.arguments?.getInt("id")
+                val token = backStackEntry.arguments?.getString("token")
+                val username = backStackEntry.arguments?.getString("username")
+                val userId = backStackEntry.arguments?.getInt("userId")
+                val role = backStackEntry.arguments?.getInt("role")
+                if (restaurantId != null && token != null && username != null && userId != null && role != null) {
+                    RestaurantDetailView(navController, restaurantId, token, username, userId, role)
+                }
+            }
+            composable(
+                route = ListScreen.UpdateReviewView.name + "/{id}/{token}/{username}/{role}",
+                arguments = listOf(
+                    navArgument("id") { type = NavType.IntType },
+                    navArgument("token") { type = NavType.StringType },
+                    navArgument("username") { type = NavType.StringType },
+                    navArgument("role") { type = NavType.IntType }
+                )
+            ) {
+                val reviewId = it.arguments?.getInt("id")
+                val token = it.arguments?.getString("token")
+                val username = it.arguments?.getString("username")
+                val role = it.arguments?.getInt("role")
+                if (reviewId != null && token != null && username != null && role != null) {
+                    UpdateReview(navController, reviewId, token, username, role)
+                }
             }
 
 

@@ -38,6 +38,7 @@ import java.io.File
 @Composable
 fun AddRestaurantView(
     navController: NavHostController,
+    role: Int,
     viewModel: RestaurantViewModel = viewModel()
 ) {
     var restaurantName by remember { mutableStateOf("") }
@@ -166,7 +167,11 @@ fun AddRestaurantView(
                         )
 
                         if (token != null) {
-                            viewModel.createRestaurant(token, context, request)
+                            if(role == 1){
+                                viewModel.createRestaurantAdmin(token, context, request)
+                            }else if (role == 2) {
+                                viewModel.createRestaurant(token, context, request)
+                            }
                         }
                         Toast.makeText(
                             navController.context,
@@ -226,8 +231,3 @@ fun getRealPathFromURI(context: Context, uri: Uri): String? {
     return filePath
 }
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun AddRestaurantViewPreview() {
-    AddRestaurantView(navController = rememberNavController())
-}

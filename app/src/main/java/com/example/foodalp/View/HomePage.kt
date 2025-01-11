@@ -18,18 +18,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.foodalp.R
-import com.example.foodalp.uiStates.UserStatusUIState
-import com.example.foodalp.uiStates.UserUIState
+//import com.example.foodalp.uistates.UserStatusUIState
+import com.example.foodalp.uistates.UserUIState
 import com.example.foodalp.viewmodels.UserViewModel
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -38,25 +35,39 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.platform.LocalContext
-import com.example.foodalp.AppContainer
 import com.example.foodalp.Route.ListScreen
 import com.example.foodalp.models.RestaurantModel
+import com.example.foodalp.models.ReviewModel
 import com.example.foodalp.ui.state.RestaurantState
+import com.example.foodalp.uistates.ReviewState
 import com.example.foodalp.viewmodel.RestaurantViewModel
+import com.example.foodalp.viewmodel.ReviewViewModel
+import com.google.gson.Gson
 
 @Composable
 fun HomePage(
     navController: NavController,
     userViewModel: UserViewModel = viewModel(),
-    restaurantViewModel: RestaurantViewModel = viewModel()
+    restaurantViewModel: RestaurantViewModel = viewModel(),
+    reviewViewModel: ReviewViewModel = viewModel()
 ) {
 //    for restaurant
     val Restaurant by restaurantViewModel.Restaurant.collectAsState()
     val UIstate by restaurantViewModel.UIstate.collectAsState()
 
+    val restoAdmin by restaurantViewModel.admin.collectAsState()
+
+
+//    for Review
+    val Review by reviewViewModel.Review.collectAsState()
+    val UIstateReview by reviewViewModel.UIstate.collectAsState()
+
+//    val RestaurantbyId by restaurantViewModel.RestaurantById.collectAsState()
+    val uiState by restaurantViewModel.UIstate.collectAsState()
+
     val context = LocalContext.current  // Get context here
 //    val restaurantViewModel = RestaurantViewModel()
-    val uiState by restaurantViewModel.uiState.collectAsState()
+//    val uiState by restaurantViewModel.uiState.collectAsState()
 
     // Assume that you retrieve the token and email from somewhere (e.g., shared preferences or session storage)
     val token = getUserToken()  // Replace this with your logic to get the token
@@ -76,6 +87,8 @@ fun HomePage(
     Log.d("HomePage", "Current state: ${userState.value}")
 
 
+
+
     LaunchedEffect(Unit) {
         if (token != null) {
             restaurantViewModel.fetchAllRestaurants(token)
@@ -85,8 +98,7 @@ fun HomePage(
     when (val state = userState.value) {
         is UserUIState.Loading -> {
             Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
             }
@@ -140,16 +152,15 @@ fun HomePage(
                                     )
                                 }
 
-                                Box(
-                                    modifier = Modifier
-                                        .size(80.dp)
-                                        .clip(CircleShape)
-                                        .background(Color(0xFF991E3D))
-                                        .padding(8.dp)
-                                        .clickable() {
-                                            // Navigasi ke UpdateUserView
-                                            navController.navigate("DetailProfileView")
-                                        }
+                                Box(modifier = Modifier
+                                    .size(80.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFF991E3D))
+                                    .padding(8.dp)
+                                    .clickable() {
+                                        // Navigasi ke UpdateUserView
+                                        navController.navigate("DetailProfileView")
+                                    }
 
                                 ) {
                                     Image(
@@ -169,10 +180,8 @@ fun HomePage(
                                     .padding(horizontal = 20.dp)
                                     .height(56.dp)
                                     .background(
-                                        color = Color.White,
-                                        shape = RoundedCornerShape(12.dp)
-                                    ),
-                                contentAlignment = Alignment.CenterStart
+                                        color = Color.White, shape = RoundedCornerShape(12.dp)
+                                    ), contentAlignment = Alignment.CenterStart
                             ) {
                                 Row(
                                     modifier = Modifier
@@ -194,8 +203,9 @@ fun HomePage(
                                     )
                                 }
                             }
+                            val role = it.roleId
                             Button(
-                                onClick = { navController.navigate(ListScreen.AddRestaurantView.name) },
+                                onClick = { navController.navigate(ListScreen.AddRestaurantView.name + "/${role}") },
                                 modifier = Modifier
                                     .fillMaxWidth(0.6f)
                                     .padding(horizontal = 20.dp),
@@ -207,19 +217,7 @@ fun HomePage(
                             ) {
                                 Text("Add Restaurant", color = Color.White, fontSize = 16.sp)
                             }
-                            Button(
-                                onClick = { navController.navigate(ListScreen.AddReview.name) },
-                                modifier = Modifier
-                                    .fillMaxWidth(0.6f)
-                                    .padding(horizontal = 20.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(
-                                        0xFF9C254D
-                                    )
-                                )
-                            ) {
-                                Text("Add Review", color = Color.White, fontSize = 16.sp)
-                            }
+
                             when (UIstate) {
                                 is RestaurantState.Loading -> {
                                     CircularProgressIndicator()  // Show loading while fetching restaurants
@@ -237,12 +235,27 @@ fun HomePage(
                                         Text("No restaurants available.")
                                     } else {
                                         if (token != null) {
-                                            RestaurantGrid(
-                                                token = token,
-                                                navController = navController,
-                                                restaurants = Restaurant,  // Pass the fetched restaurant data
-                                                restaurantViewModel = restaurantViewModel
-                                            )
+                                            if(it.roleId == 2) {
+                                                RestaurantGrid(
+                                                    token = token,
+                                                    navController = navController,
+                                                    restaurants = Restaurant,  // Pass the fetched restaurant data
+                                                    username = it.username,
+                                                    role = it.roleId,
+                                                    userId = it.id,
+                                                    restaurantViewModel = restaurantViewModel
+                                                )
+                                            }else if(it.roleId == 1){
+                                                RestaurantGrid(
+                                                    token = token,
+                                                    navController = navController,
+                                                    restaurants = restoAdmin,  // Pass the fetched restaurant data
+                                                    username = it.username,
+                                                    role = it.roleId,
+                                                    userId = it.id,
+                                                    restaurantViewModel = restaurantViewModel
+                                                )
+                                            }
                                         }
                                     }
                                 }
@@ -251,6 +264,7 @@ fun HomePage(
                                     Text("Welcome!")  // Initial state or any placeholder UI
                                 }
                             }
+
                         }
                     }
                 }
@@ -259,8 +273,7 @@ fun HomePage(
 
         is UserUIState.Error -> {
             Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "Error: ${state.message}",
@@ -285,10 +298,8 @@ fun SearchBar() {
             .padding(horizontal = 20.dp)
             .height(56.dp)
             .background(
-                color = Color.White,
-                shape = RoundedCornerShape(12.dp)
-            ),
-        contentAlignment = Alignment.CenterStart
+                color = Color.White, shape = RoundedCornerShape(12.dp)
+            ), contentAlignment = Alignment.CenterStart
     ) {
         Row(
             modifier = Modifier
@@ -314,15 +325,15 @@ fun SearchBar() {
 
 @Composable
 fun RestaurantGrid(
-    token : String,
+    token: String,
     navController: NavController,
     restaurants: List<RestaurantModel>,
+    username : String,
+    role: Int,
+    userId : Int,
     restaurantViewModel: RestaurantViewModel,
     modifier: Modifier = Modifier
 ) {
-    // Group restaurants into pairs (two restaurants per row)
-    val restaurantPairs = restaurants.chunked(1)
-
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -330,11 +341,11 @@ fun RestaurantGrid(
     ) {
         items(restaurants) { restaurant ->
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 RestaurantCard(
-                    onCardClick = {navController?.navigate(ListScreen.UpdateRestaurantView.name + "/${restaurant.id}/${token}")},
+                    onCardClick = { navController.navigate(ListScreen.RestaurantDetailView.name + "/${restaurant.id}/${token}/${username}/${userId}/${role}")},
+//                    onCardClick = { navController.navigate(ListScreen.UpdateRestaurantView.name + "/${restaurant.id}/${token}") },
                     navController = navController,
                     restaurant = restaurant,
                     viewModel = restaurantViewModel,
@@ -346,6 +357,8 @@ fun RestaurantGrid(
         }
     }
 }
+
+
 
 // Retrieve token from SharedPreferences
 @Composable

@@ -41,6 +41,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.rememberAsyncImagePainter
@@ -57,8 +59,10 @@ fun RestaurantCard(
     viewModel: RestaurantViewModel,
     modifier: Modifier = Modifier,
 ) {
+    val customFontFamily = FontFamily(
+        Font(R.font.jua)
+    )
 
-    val token = getUserToken()
 
     Log.d("masuk ke display restaurantCard", "Restaurant name: ${restaurant.name}")
     Log.d("masuk ke display restaurantCard", "Restaurant phone: ${restaurant.phone}")
@@ -71,14 +75,14 @@ fun RestaurantCard(
             .border(2.dp, Color(0xFF0051FF), RoundedCornerShape(12.dp)), // Blue border
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFF5F5F5) // Light gray background
+            containerColor = Color(0xFFF5F5F5)
         ),
-        elevation = CardDefaults.cardElevation(4.dp) // Optional: Add slight elevation
+        elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp), // Ensure padding inside the card
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Display restaurant image
@@ -86,23 +90,23 @@ fun RestaurantCard(
                 modifier = Modifier
                     .size(50.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFFE0E0E0)), // Light gray for placeholder
+                    .background(Color(0xFFE0E0E0)),
                 contentAlignment = Alignment.Center
             ) {
                 SubcomposeAsyncImage(
                     model = restaurant.image,
                     contentDescription = "Restaurant Image",
                     loading = {
-                        CircularProgressIndicator() // Show a loading indicator while the image loads
+                        CircularProgressIndicator()
                     },
                     error = {
-                        Text("Image failed to load") // Fallback UI if the image fails to load
+                        Text("Image failed to load")
                     },
-                    contentScale = ContentScale.Crop, // Optional: Adjust the scaling of the image
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
-                        .clip(RoundedCornerShape(8.dp)) // Optional: Apply rounded corners
+                        .clip(RoundedCornerShape(8.dp))
                 )
             }
 
@@ -115,40 +119,55 @@ fun RestaurantCard(
                 // Restaurant Name
                 Text(
                     text = restaurant.name,
+                    fontFamily = customFontFamily,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF1A1A1A)
                 )
 
                 // Address
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_location_on_24),
-                        contentDescription = "Location Icon",
-                        tint = Color(0xFF8E8E8E),
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = restaurant.address,
-                        fontSize = 14.sp,
-                        color = Color(0xFF8E8E8E)
-                    )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_location_on_24),
+                            contentDescription = "Location Icon",
+                            tint = Color(0xFF8E8E8E),
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = restaurant.address,
+                            fontFamily = customFontFamily,
+                            fontSize = 14.sp,
+                            color = Color(0xFF8E8E8E)
+                        )
+                    }
                     Button(
                         onClick = onCardClick,
                         modifier = Modifier
-                            .fillMaxWidth(0.6f),
-//                            .padding(horizontal = 20.dp),
+                            .height(40.dp)
+                            .clip(RoundedCornerShape(20.dp)),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(
-                                0xFF9C254D
-                            )
-                        )
+                            containerColor = Color(0xFF9C254D)
+                        ),
+                        elevation = ButtonDefaults.elevatedButtonElevation(4.dp)
                     ) {
-                        Text("Update Restaurant", color = Color.White, fontSize = 16.sp)
+                        Text(
+                            text = "See Details",
+                            color = Color.White,
+                            fontFamily = customFontFamily,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
-
                 Spacer(modifier = Modifier.height(8.dp))
             }
 

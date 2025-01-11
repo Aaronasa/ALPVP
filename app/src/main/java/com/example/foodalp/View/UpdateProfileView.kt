@@ -31,10 +31,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.example.foodalp.R
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.foodalp.AppContainer
 import com.example.foodalp.Route.ListScreen
 import com.example.foodalp.viewmodels.UserViewModel
-import com.example.foodalp.uiStates.UserStatusUIState
+import com.example.foodalp.uistates.UserStatusUIState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

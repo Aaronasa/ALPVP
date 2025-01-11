@@ -45,17 +45,17 @@ class RestaurantViewModel() : ViewModel() {
     private val _Restaurant = MutableStateFlow<List<RestaurantModel>>(emptyList())
     val Restaurant = _Restaurant
 
+    private val _admin = MutableStateFlow<List<RestaurantModel>>(emptyList())
+    val admin = _admin
+
     private val _UIState = MutableStateFlow<RestaurantState>(RestaurantState.Start)
     val UIstate : StateFlow<RestaurantState> = _UIState
 
     private val _RestaurantById = MutableStateFlow<RestaurantModel?>(null)
     val RestaurantById : StateFlow<RestaurantModel?> = _RestaurantById
 
-
-//    private val _RestaurantByIdState = MutableStateFlow<RestaurantByIdState>(RestaurantByIdState.Start)
-//    val RestaurantByIdState : StateFlow<RestaurantByIdState> = _RestaurantByIdState
-
-
+    private val _adminById = MutableStateFlow<RestaurantModel?>(null)
+    val adminById : StateFlow<RestaurantModel?> = _adminById
 
     fun fetchAllRestaurants(token: String) {
         viewModelScope.launch {
@@ -71,48 +71,66 @@ class RestaurantViewModel() : ViewModel() {
         }
     }
 
-    fun FetchRestaurantById(token: String, restaurantId: Int, callback: (RestaurantModel?) -> Unit){
+    fun fetchAllRestaurantsAdmin(token: String) {
         viewModelScope.launch {
             _UIState.value = RestaurantState.Loading
             try {
-                val FetchRestaurantById = repository.getRestaurantById(token, restaurantId)
-                Log.d("ViewModel", "Fetched restaurants: $FetchRestaurantById")
-                _RestaurantById.value = FetchRestaurantById
-                _UIState.value = RestaurantState.Success(listOf(FetchRestaurantById!!))
-                callback(FetchRestaurantById)
+                val FetchRestaurant = repository.getAllRestaurantsAdmin(token)
+                Log.d("ViewModel", "Fetched restaurants: $FetchRestaurant")
+                _admin.value = FetchRestaurant
+                _UIState.value = RestaurantState.Success(FetchRestaurant)
             } catch (e: Exception) {
                 _UIState.value = RestaurantState.Failed(e.message ?: "Unknown error")
             }
         }
     }
 
+    fun FetchRestaurantById(token: String, restaurantId: Int, callback: (RestaurantModel?) -> Unit) {
+        viewModelScope.launch {
+            _UIState.value = RestaurantState.Loading
+            try {
+                // Fetch the restaurant by ID
+                val response = repository.getRestaurantById(token, restaurantId)
+                Log.d("ViewModel", "Fetched restaurant: $response")
+                _RestaurantById.value = response
+                _UIState.value = RestaurantState.Success(listOf(response!!))
+                callback(response)
+            } catch (e: Exception) {
+                // Handle exceptions
+                Log.e("ViewModel", "Error fetching restaurant: ${e.message}", e)
+                _UIState.value = RestaurantState.Failed(e.message ?: "Unknown error")
+                callback(null)
+            }
+        }
+    }
 
-//    fun fetchRestaurantById(token: String, restaurantId: Int, callback: (RestaurantModel?) -> Unit) {
-//        Log.d("ViewModel", "Fetching restaurant by id sebelum masuk launch: $restaurantId")
-//        viewModelScope.launch {
-//            Log.d("ViewModel", "Fetching restaurant by id setelah masuk launch: $restaurantId")
-//            try {
-//                Log.d("ViewModel", "Fetching restaurant by id sebelum dikirim ke repository: $restaurantId")
-//                val response = repository.getRestaurantById(token, restaurantId)
-//                Log.d("viemodelModel", "Fetching restaurant by id setelah masuk ke repository: $response")
-//                callback(response)
-//            } catch (e: Exception) {
-//                Log.e("ViewModel", "Error fetching restaurant by id: ${e.message}", e)
-//                callback(null)
-//            }
-//        }
-//    }
+    fun FetchRestaurantByIdAdmin(token: String, restaurantId: Int, callback: (RestaurantModel?) -> Unit) {
+        viewModelScope.launch {
+            _UIState.value = RestaurantState.Loading
+            try {
+                // Fetch the restaurant by ID
+                val response = repository.getRestaurantByIdAdmin(token, restaurantId)
+                Log.d("ViewModel", "Fetched restaurant: $response")
+                _adminById.value = response
+                _UIState.value = RestaurantState.Success(listOf(response!!))
+                callback(response)
+            } catch (e: Exception) {
+                // Handle exceptions
+                Log.e("ViewModel", "Error fetching restaurant: ${e.message}", e)
+                _UIState.value = RestaurantState.Failed(e.message ?: "Unknown error")
+                callback(null)
+            }
+        }
+    }
 
     fun createRestaurant(token: String, context: Context, request: CreateRestaurantRequest) {
         viewModelScope.launch {
             try {
                 Log.d("ViewModel", "Sending createRestaurant request: $request")
-                // Ensure the image is not null
-                val imagePart = request.image ?: throw Exception("Image is required for creating a restaurant") // Throw an exception if the image is null
-                // Create the restaurant with the image part
+                val imagePart = request.image ?: throw Exception("Image is required for creating a restaurant")
                 repository.createRestaurant(token, request.copy(image = imagePart), context)
                 Log.d("ViewModel", "Restaurant created successfully")
-                fetchAllRestaurants(token) // Refresh after creation
+                fetchAllRestaurants(token)
                 _uiState.value = _uiState.value.copy(errorMessage = null)
             } catch (e: Exception) {
                 Log.e("ViewModel", "Error creating restaurant: ${e.message}")
@@ -122,12 +140,59 @@ class RestaurantViewModel() : ViewModel() {
         }
     }
 
+    fun createRestaurantAdmin(token: String, context: Context, request: CreateRestaurantRequest) {
+        viewModelScope.launch {
+            try {
+                Log.d("ViewModel", "Sending createRestaurant request: $request")
+                val imagePart = request.image ?: throw Exception("Image is required for creating a restaurant")
+                repository.createRestaurantAdmin(token, request.copy(image = imagePart), context)
+                Log.d("ViewModel", "Restaurant created successfully")
+                fetchAllRestaurantsAdmin(token)
+                _uiState.value = _uiState.value.copy(errorMessage = null)
+            } catch (e: Exception) {
+                Log.e("ViewModel", "Error creating restaurant: ${e.message}")
+                _uiState.value = _uiState.value.copy(errorMessage = e.message)
+                Log.e("RestaurantViewModel", "Error creating restaurant: ${e.message}")
+            }
+        }
+    }
+
+    fun updateRestaurant(token : String,id: Int, request: UpdateRestaurantRequest) {
+        viewModelScope.launch {
+            try {
+                repository.updateRestaurant(token, id, request)
+                fetchAllRestaurantsAdmin(token)
+                _uiState.value = _uiState.value.copy(errorMessage = null)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = e.message ?: "Failed to update restaurant"
+                )
+            }
+        }
+    }
+
+    fun deleteRestaurant(id: Int, token: String) {
+        viewModelScope.launch {
+            try {
+                Log.d("Restaurant View Model", "Starting delete restaurant with ID: $id and token: ${token.take(10)}...")
+                val result = repository.deleteRestaurant(id, token)
+                Log.d("Restaurant View Model", "Delete successful for ID: $id")
+                fetchAllRestaurantsAdmin(token)
+                _uiState.value = _uiState.value.copy(errorMessage = null)
+            } catch (e: Exception) {
+                Log.e("Restaurant View Model", "Error deleting restaurant with ID: $id", e)
+                _uiState.value = _uiState.value.copy(errorMessage = e.message)
+            }
+        }
+    }
+
     fun createImagePart(context: Context, imageUri: Uri): MultipartBody.Part {
-        val file = File(getRealPathFromURI(context, imageUri)) // Convert URI to actual file
+        val file = File(getRealPathFromURI(context, imageUri))
         val requestBody =
-            file.asRequestBody("image/jpeg".toMediaTypeOrNull()) // Adjust content type accordingly
+            file.asRequestBody("image/jpeg".toMediaTypeOrNull())
         return MultipartBody.Part.createFormData("image", file.name, requestBody)
     }
+
 
     fun getRealPathFromURI(context: Context, uri: Uri): String? {
         var filePath: String? = null
@@ -148,27 +213,6 @@ class RestaurantViewModel() : ViewModel() {
         return filePath
     }
 
-    fun updateRestaurant(request: UpdateRestaurantRequest, token: String) {
-        viewModelScope.launch {
-            try {
-                repository.updateRestaurant(request)
-                fetchAllRestaurants(token) // Pass the token to fetchAllRestaurants
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(errorMessage = e.message)
-            }
-        }
-    }
-
-    fun deleteRestaurant(id: Int, token: String) {
-        viewModelScope.launch {
-            try {
-                repository.deleteRestaurant(id)
-                fetchAllRestaurants(token) // Pass the token to fetchAllRestaurants
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(errorMessage = e.message)
-            }
-        }
-    }
 
 
 }

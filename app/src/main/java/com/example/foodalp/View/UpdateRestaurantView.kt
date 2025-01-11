@@ -45,20 +45,23 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.foodalp.models.UpdateRestaurantRequest
 import com.example.foodalp.viewmodel.RestaurantViewModel
 import com.example.foodalp.R
+import com.example.foodalp.models.RestaurantModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpdateRestaurantView(
     navController: NavHostController,
-    restaurantId: Int, // The ID of the restaurant to update
+    restaurantId: Int,
     token: String,
-    RestaurantviewModel: RestaurantViewModel = viewModel()
+    RestaurantViewModel: RestaurantViewModel = viewModel(),
+
 ) {
     Log.d("UpdateRestaurantView", "Token: $token")
     Log.d("UpdateRestaurantView", "Restaurant ID: $restaurantId")
 
-    val Restaurant by RestaurantviewModel.RestaurantById.collectAsState()
-    val UIstate by RestaurantviewModel.UIstate.collectAsState()
+    val Restaurant by RestaurantViewModel.RestaurantById.collectAsState()
+    val UIstate by RestaurantViewModel.UIstate.collectAsState()
+
 
     // State for form fields
     var restaurantName by remember { mutableStateOf("") }
@@ -68,13 +71,13 @@ fun UpdateRestaurantView(
     var isDataLoaded by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    val uiState by RestaurantviewModel.uiState.collectAsState()
+    val uiState by RestaurantViewModel.uiState.collectAsState()
 
-    // Load restaurant data
     LaunchedEffect(restaurantId) {
         Log.d("UpdateRestaurantView", "Loading restaurant data for ID: $restaurantId")
         if (!isDataLoaded) {
-            RestaurantviewModel.FetchRestaurantById(
+            Log.d("UpdateRestaurantView", "Check load data => id: $restaurantId dan token: $token")
+            RestaurantViewModel.FetchRestaurantByIdAdmin(
                 token = token, // Replace with actual token logic
                 restaurantId = restaurantId
             ) { restaurant ->
@@ -196,34 +199,27 @@ fun UpdateRestaurantView(
                     val phone = restaurantPhone.trim()
 
                     if (name.isNotEmpty() && address.isNotEmpty() && phone.isNotEmpty()) {
-                        val imagePart = imageUri?.let { uri ->
-                            RestaurantviewModel.createImagePart(
-                                context,
-                                uri
-                            )
-                        }
 
-                        val request = UpdateRestaurantRequest(
-                            id = restaurantId,
-                            name = name,
-                            address = address,
-                            phone = phone,
-                            image = imagePart
-                        )
+                            try {
+                                val imagePart = imageUri?.let { uri ->
+                                    RestaurantViewModel.createImagePart(context, uri)
+                                }
 
-                        RestaurantviewModel.updateRestaurant(
-                            request,
-                            token = token
-                        ) // Replace with actual token logic
-                        Toast.makeText(
-                            context,
-                            "Restaurant Updated Successfully",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        navController.popBackStack()
+                                val request = UpdateRestaurantRequest(
+                                    name = name,
+                                    address = address,
+                                    phone = phone,
+                                    image = imagePart
+                                )
+
+                                RestaurantViewModel.updateRestaurant(token, restaurantId, request)
+                                Toast.makeText(context, "Restaurant Updated Successfully", Toast.LENGTH_SHORT).show()
+                                navController.popBackStack()
+                            } catch (e: Exception) {
+                                Toast.makeText(context, e.message ?: "Update failed", Toast.LENGTH_SHORT).show()
+                            }
                     } else {
-                        Toast.makeText(context, "Please fill all the fields!", Toast.LENGTH_SHORT)
-                            .show()
+                        Toast.makeText(context, "Please fill all the fields!", Toast.LENGTH_SHORT).show()
                     }
                 },
                 modifier = Modifier.fillMaxWidth(0.6f),
@@ -244,5 +240,7 @@ fun UpdateRestaurantView(
         }
     }
 }
+
+
 
 

@@ -33,7 +33,6 @@
 
     // Request model for updating a restaurant
     data class UpdateRestaurantRequest(
-        val id: Int,
         val name: String? = null,
         val address: String? = null,
         val phone: String? = null,
