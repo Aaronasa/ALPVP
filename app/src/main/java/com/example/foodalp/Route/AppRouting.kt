@@ -21,6 +21,7 @@ import com.example.foodalp.View.AdminPage
 import com.example.foodalp.View.AppDescView
 import com.example.foodalp.View.CityDetailView
 import com.example.foodalp.View.CityDetailViewAdmin
+import com.example.foodalp.View.CityUDViewAdmin
 import com.example.foodalp.View.DetailProfileView
 import com.example.foodalp.View.HomePage
 import com.example.foodalp.View.Launchview
@@ -167,6 +168,27 @@ fun AppRouting() {
                     CityDetailViewAdmin(cityId, token, navController, username, userId, role)
                 }
             }
+            composable(
+                route = ListScreen.CityUDViewAdmin.name + "/{id}/{token}/{username}/{userId}/{role}",
+                arguments = listOf(
+                    navArgument("id") { type = NavType.IntType },
+                    navArgument("token") { type = NavType.StringType },
+                    navArgument("username") { type = NavType.StringType },
+                    navArgument("userId") { type = NavType.IntType },
+                    navArgument("role") { type = NavType.IntType }
+                )
+            ) { backStackEntry ->
+                // Retrieve the arguments from the backStackEntry
+                val cityId = backStackEntry.arguments?.getInt("id")
+                val token = backStackEntry.arguments?.getString("token")
+                val username = backStackEntry.arguments?.getString("username")
+                val userId = backStackEntry.arguments?.getInt("userId")
+                val role = backStackEntry.arguments?.getInt("role")
+                if (cityId != null && token != null && username != null && userId != null && role != null) {
+                    CityUDViewAdmin(cityId, token, navController, username, userId, role)
+                }
+            }
+
             composable(
                 route = ListScreen.AddReview.name + "/{id}/{token}/{username}/{userId}/{role}",
                 arguments = listOf(

@@ -23,4 +23,5 @@ enum class ListScreen {
     UpdateReviewView,
     RestaurantDetailViewAdmin,
     AddRestaurantViewAdmin,
+    CityUDViewAdmin
 }
