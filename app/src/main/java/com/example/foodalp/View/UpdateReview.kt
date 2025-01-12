@@ -50,7 +50,6 @@ fun UpdateReview(
     var isDataLoaded by remember { mutableStateOf(false) }
     val uiState by ReviewViewModel.uiState.collectAsState()
 
-    if(role == 2) {
         LaunchedEffect(reviewId) {
             Log.d("UpdateRestaurantView", "Loading restaurant data for ID: $reviewId")
             if (!isDataLoaded) {
@@ -70,28 +69,7 @@ fun UpdateReview(
                 }
             }
         }
-    }
-    else if (role == 1){
-        LaunchedEffect(reviewId) {
-            Log.d("UpdateRestaurantView", "Loading restaurant data for ID: $reviewId")
-            if (!isDataLoaded) {
-                Log.d("UpdateRestaurantView", "Check load data => id: $reviewId dan token: $token")
-                if (token != null) {
-                    ReviewViewModel.fetchReviewByIdAdmin(
-                        token = token, // Replace with actual token logic
-                        reviewId = reviewId
-                    ) { review ->
-                        Log.d("UpdateRestaurantView", "Loaded restaurant: $review")
-                        review?.let {
-                            reviewText = it.content
-                            ratingInput = it.rating.toString()
-                            isDataLoaded = true
-                        }
-                    }
-                }
-            }
-        }
-    }
+
 
 
 
@@ -188,16 +166,11 @@ fun UpdateReview(
                         val rating = rating.toInt();
 
                         if (token != null) {
-                            if(role == 2) {
+
                                 ReviewViewModel.updateReview(
                                     token, reviewId, content, rating
                                 )
-                            }
-                            else if (role == 2){
-                                ReviewViewModel.updateReviewAdmin(
-                                    token, reviewId, content, rating
-                                )
-                            }
+
                         }
                         Toast.makeText(
                             navController.context,

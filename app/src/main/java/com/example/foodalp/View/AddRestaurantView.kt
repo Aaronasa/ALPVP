@@ -167,11 +167,9 @@ fun AddRestaurantView(
                         )
 
                         if (token != null) {
-                            if(role == 1){
-                                viewModel.createRestaurantAdmin(token, context, request)
-                            }else if (role == 2) {
+
                                 viewModel.createRestaurant(token, context, request)
-                            }
+
                         }
                         Toast.makeText(
                             navController.context,

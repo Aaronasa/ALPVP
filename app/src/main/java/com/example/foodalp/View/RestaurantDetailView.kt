@@ -89,7 +89,7 @@ fun RestaurantDetailView(
 
     var isDataLoaded by remember { mutableStateOf(false) }
     var isReviewLoaded by remember { mutableStateOf(false) }
-    if (role == 2) {
+
         LaunchedEffect(restauranId) {
             Log.d("RestaurantDetailView", "Loading restaurant data for ID: $restauranId")
             if (!isDataLoaded) {
@@ -118,36 +118,7 @@ fun RestaurantDetailView(
                 isReviewLoaded = true
             }
         }
-    } else if (role == 1) {
-        LaunchedEffect(restauranId) {
-            Log.d("RestaurantDetailView", "Loading restaurant data for ID: $restauranId")
-            if (!isDataLoaded) {
-                Log.d(
-                    "RestaurantDetailView",
-                    "Check load data => id: $restauranId dan token: $token"
-                )
-                RestaurantviewModel.FetchRestaurantByIdAdmin(
-                    token = token,
-                    restaurantId = restauranId
-                ) { restaurant ->
-                    Log.d("RestaurantDetailView", "Loaded restaurant: $restaurant")
-                    restaurant?.let {
-                        restaurantName = it.name
-                        restaurantAddress = it.address
-                        restaurantPhone = it.phone
-                        image = it.image
-                        isDataLoaded = true
-                    }
-                }
-            }
-            if (!isReviewLoaded) {
-                ReviewViewModel.fetchAllReviewsAdmin(
-                    token = token
-                )
-                isReviewLoaded = true
-            }
-        }
-    }
+
 
     Log.d("restaurantDetailView", "restaurantName: $restaurantName")
     Log.d("restaurantDetailView", "restaurantAddress: $restaurantAddress")
@@ -178,7 +149,7 @@ fun RestaurantDetailView(
                 modifier = Modifier.fillMaxSize()
             )
             IconButton(
-                onClick = { navController.navigate(ListScreen.HomePage.name) },
+                onClick = { navController.navigate(ListScreen.CityDetailView.name) },
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .padding(8.dp)
@@ -371,7 +342,6 @@ fun RestaurantDetailView(
                 if (reviews.isEmpty()) {
                     Text("No reviews available.")
                 } else {
-                    if(role == 2) {
                         ReviewGrid(
                             token = token,
                             navController = navController,
@@ -382,19 +352,6 @@ fun RestaurantDetailView(
                             username = username,
                             reviewViewModel = ReviewViewModel
                         )
-                    }
-                    else if (role == 1){
-                        ReviewGrid(
-                            token = token,
-                            navController = navController,
-                            reviews = ReviewAdmin,
-                            restauranId = restauranId,
-                            role = role,
-                            userid = userId,
-                            username = username,
-                            reviewViewModel = ReviewViewModel
-                        )
-                    }
                 }
             }
 

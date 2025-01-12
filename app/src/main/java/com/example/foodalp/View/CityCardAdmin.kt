@@ -41,6 +41,9 @@ fun CityCard1(
     modifier: Modifier = Modifier,
     city: CityModel,
     viewModel: CityViewModel,
+    username: String,
+    role: Int,
+    userId: Int,
     navController: NavController
 ) {
     val customFontFamily = FontFamily(
@@ -55,7 +58,7 @@ fun CityCard1(
             defaultElevation = 6.dp
         ),
         onClick = {
-            navController.navigate(ListScreen.CityDetailViewAdmin.name + "/${city.id}/${token}")
+            navController.navigate(ListScreen.CityDetailViewAdmin.name + "/${city.id}/${token}/${username}/${userId}/${role}")
         },
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier

@@ -120,37 +120,43 @@ fun AppRouting() {
                 }
             }
             composable(
-                route = ListScreen.CityDetailView.name + "/{id}/{token}",
+                route = ListScreen.CityDetailView.name + "/{id}/{token}/{username}/{userId}/{role}",
                 arguments = listOf(
                     navArgument("id") { type = NavType.IntType },
-                    navArgument("token") { type = NavType.StringType }
+                    navArgument("token") { type = NavType.StringType },
+                    navArgument("username") { type = NavType.StringType },
+                    navArgument("userId") { type = NavType.IntType },
+                    navArgument("role") { type = NavType.IntType }
                 )
             ) { backStackEntry ->
                 val cityId = backStackEntry.arguments?.getInt("id")
                 val token = backStackEntry.arguments?.getString("token")
-                if (cityId != null && token != null) {
-                    CityDetailView(cityId, token, navController)
+                val username = backStackEntry.arguments?.getString("username")
+                val userId = backStackEntry.arguments?.getInt("userId")
+                val role = backStackEntry.arguments?.getInt("role")
+                if (cityId != null && token != null && username != null && userId != null && role != null) {
+                    CityDetailView(cityId, token, navController, username, userId, role)
                 }
             }
             composable(
-                route = ListScreen.CityDetailViewAdmin.name + "/{id}/{token}",
+                route = ListScreen.CityDetailViewAdmin.name + "/{id}/{token}/{username}/{userId}/{role}",
                 arguments = listOf(
-                    navArgument("id") {
-                        type = NavType.IntType
-                    },  // Define the 'id' as an integer type
-                    navArgument("token") {
-                        type = NavType.StringType
-                    }  // Define the 'token' as a string type
+                    navArgument("id") { type = NavType.IntType },
+                    navArgument("token") { type = NavType.StringType },
+                    navArgument("username") { type = NavType.StringType },
+                    navArgument("userId") { type = NavType.IntType },
+                    navArgument("role") { type = NavType.IntType }
                 )
             ) { backStackEntry ->
                 // Retrieve the arguments from the backStackEntry
-                val id = backStackEntry.arguments?.getInt("id")
-                    ?: 0  // Default to 0 if id is not found
+                val cityId = backStackEntry.arguments?.getInt("id")
                 val token = backStackEntry.arguments?.getString("token")
-                    ?: ""  // Default to empty string if token is not found
-
-                // Use id and token in your DetailCityView composable
-                CityDetailViewAdmin(cityId = id, token = token)
+                val username = backStackEntry.arguments?.getString("username")
+                val userId = backStackEntry.arguments?.getInt("userId")
+                val role = backStackEntry.arguments?.getInt("role")
+                if (cityId != null && token != null && username != null && userId != null && role != null) {
+                    CityDetailViewAdmin(cityId, token, navController, username, userId, role)
+                }
             }
             composable(
                 route = ListScreen.AddReview.name + "/{id}/{token}/{username}/{userId}/{role}",

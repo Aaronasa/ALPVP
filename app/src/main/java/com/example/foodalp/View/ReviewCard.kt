@@ -137,7 +137,6 @@ fun ReviewCard(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                if (role == 2) {
                     if (userIds == userId) {
                         // Update and Delete buttons
                         Row(
@@ -195,62 +194,7 @@ fun ReviewCard(
                             }
                         }
                     }
-                } else if (role == 1){
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End // Align buttons to the end
-                    ) {
-                        Button(
-                            onClick = UpdateClick,
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF9C254D),
-                                contentColor = Color.White
-                            ),
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .padding(end = 8.dp)
-                                .size(100.dp, 36.dp) // Smaller button size
-                        ) {
-                            Text(
-                                text = "Update",
-                                fontFamily = customFontFamily,
-                                fontSize = 14.sp
-                            )
-                        }
-                        Button(
-                            onClick = {
-                                Log.d("Review Card", "Sebelum masuk ke view model: $reviewId")
-                                if (reviewId != null && token.isNotEmpty()) {
-                                    ReviewViewModel.deleteReviewAdmin(token, reviewId)
-                                    Toast.makeText(
-                                        navController.context,
-                                        "Review Delete Successfully",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                } else {
-                                    Toast.makeText(
-                                        navController.context,
-                                        "Failed to delete. Invalid data.",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF9C254D),
-                                contentColor = Color.White
-                            ),
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .size(100.dp, 36.dp)
-                        ) {
-                            Text(
-                                text = "Delete",
-                                fontFamily = customFontFamily,
-                                fontSize = 14.sp
-                            )
-                        }
-                    }
-                }
+
             }
         }
 

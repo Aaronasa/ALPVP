@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.foodalp.R
 import com.example.foodalp.uistates.UserUIState
 import com.example.foodalp.viewmodels.UserViewModel
 import android.content.Context
@@ -37,6 +36,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.ui.platform.LocalContext
+import com.example.foodalp.R
 
 
 import com.example.foodalp.models.ReviewModel
@@ -60,9 +60,9 @@ fun HomePage(
     cityViewModel: CityViewModel = viewModel()
 ) {
 //    for restaurant
-    val Restaurant by restaurantViewModel.Restaurant.collectAsState()
+
     val City by cityViewModel.City.collectAsState()
-    val RestaurantUIstate by restaurantViewModel.UIstate.collectAsState()
+
     val CityUIstate by cityViewModel.UIstate.collectAsState()
 
     val restoAdmin by restaurantViewModel.admin.collectAsState()
@@ -207,7 +207,10 @@ fun HomePage(
                                                 token = token,
                                                 navController = navController,
                                                 cities = City,  // Pass the fetched restaurant data
-                                                cityViewModel = cityViewModel
+                                                cityViewModel = cityViewModel,
+                                                username = it.username,
+                                                role = it.roleId,
+                                                userId = it.id,
                                             )
                                         }
                                     }
@@ -219,56 +222,7 @@ fun HomePage(
                             }
 
 
-                            val role = it.roleId
-                            Button(
-                                onClick = { navController.navigate(ListScreen.AddRestaurantView.name + "/${role}") },
-                                modifier = Modifier
-                                    .fillMaxWidth(0.6f)
-                                    .padding(horizontal = 20.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(
-                                        0xFF9C254D
-                                    )
-                                )
-                            ) {
-                                Text("Add Restaurant", color = Color.White, fontSize = 16.sp)
-                            }
-                            when (RestaurantUIstate) {
-                                is RestaurantState.Loading -> {
-                                    CircularProgressIndicator()  // Show loading while fetching restaurants
-                                }
 
-                                is RestaurantState.Failed -> {
-                                    val errorMessage =
-                                        (RestaurantUIstate as RestaurantState.Failed).errorMessage
-                                    Text(errorMessage)  // Display the error message
-                                }
-
-                                is RestaurantState.Success -> {
-                                    val restaurants =
-                                        (RestaurantUIstate as RestaurantState.Success).data
-                                    if (restaurants.isEmpty()) {
-                                        Text("No restaurants available.")
-                                    } else {
-                                        if (token != null) {
-                                            Log.d("HomePage", "Role Id: ${it.roleId}")
-                                                RestaurantGrid(
-                                                    token = token,
-                                                    navController = navController,
-                                                    restaurants = Restaurant,  // Pass the fetched restaurant data
-                                                    username = it.username,
-                                                    role = it.roleId,
-                                                    userId = it.id,
-                                                    restaurantViewModel = restaurantViewModel
-                                                )
-                                        }
-                                    }
-                                }
-
-                                is RestaurantState.Start -> {
-                                    Text("Welcome!")  // Initial state or any placeholder UI
-                                }
-                            }
                         }
                     }
                 }
@@ -293,40 +247,7 @@ fun HomePage(
     }
 }
 
-@Composable
-fun RestaurantGrid(
-    token: String,
-    navController: NavController,
-    restaurants: List<RestaurantModel>,
-    username : String,
-    role: Int,
-    userId : Int,
-    restaurantViewModel: RestaurantViewModel,
-    modifier: Modifier = Modifier
-) {
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-    ) {
-        items(restaurants) { restaurant ->
-            Row(
-                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                RestaurantCard(
-                    onCardClick = { navController.navigate(ListScreen.RestaurantDetailView.name + "/${restaurant.id}/${token}/${username}/${userId}/${role}")},
-//                    onCardClick = { navController.navigate(ListScreen.UpdateRestaurantView.name + "/${restaurant.id}/${token}") },
-                    navController = navController,
-                    restaurant = restaurant,
-                    viewModel = restaurantViewModel,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(8.dp)
-                )
-            }
-        }
-    }
-}
+
 
 @Composable
 fun CityGrid(
@@ -334,6 +255,9 @@ fun CityGrid(
     navController: NavController,
     cities: List<CityModel>,
     cityViewModel: CityViewModel,
+    username: String,
+    role: Int,
+    userId: Int,
     modifier: Modifier = Modifier
 ) {
     LazyRow (
@@ -348,6 +272,9 @@ fun CityGrid(
                 navController = navController,
                 city = city,
                 viewModel = cityViewModel,
+                username = username,
+                role = role,
+                userId = userId,
                 modifier = Modifier
                     .padding(8.dp)
             )

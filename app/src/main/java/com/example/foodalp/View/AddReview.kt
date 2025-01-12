@@ -138,7 +138,7 @@ fun AddReview(
 
 
                         if (token != null) {
-                            if(role == 2) {
+
                                 ReviewViewModel.createReview(
                                     token,
                                     userId,
@@ -146,16 +146,7 @@ fun AddReview(
                                     content,
                                     rating
                                 )
-                            }
-                            else if (role == 1){
-                                ReviewViewModel.createReviewAdmin(
-                                    token,
-                                    userId,
-                                    restaurantId,
-                                    content,
-                                    rating
-                                )
-                            }
+
                         }
                         Toast.makeText(
                             navController.context,

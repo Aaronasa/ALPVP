@@ -180,7 +180,10 @@ fun AdminPage(
                                 token = token.toString(),
                                 navController = navController,
                                 cities = City,
-                                cityViewModel = cityViewModel
+                                cityViewModel = cityViewModel,
+                                username = it.username,
+                                role = it.roleId,
+                                userId = it.id
                             )
                         }
                     }
@@ -227,6 +230,9 @@ fun CityGrid1(
     navController: NavController,
     cities: List<CityModel>,
     cityViewModel: CityViewModel,
+    username: String,
+    role: Int,
+    userId: Int,
     modifier: Modifier = Modifier
 ) {
     LazyRow (
@@ -241,6 +247,9 @@ fun CityGrid1(
                 navController = navController,
                 city = city,
                 viewModel = cityViewModel,
+                username = username,
+                role = role,
+                userId = userId,
                 modifier = Modifier
                     .padding(8.dp)
             )
