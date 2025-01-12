@@ -3,7 +3,6 @@ package com.example.foodalp.Route
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -16,29 +15,28 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.foodalp.View.AddCityView
 import com.example.foodalp.View.AddRestaurantView
+import com.example.foodalp.View.AddRestaurantViewAdmin
 import com.example.foodalp.View.AddReview
 import com.example.foodalp.View.AdminPage
 import com.example.foodalp.View.AppDescView
-import com.example.foodalp.View.DetailProfileView
-import com.example.foodalp.View.Launchview
-import com.example.foodalp.View.LoginView
-import com.example.foodalp.View.HomePage
 import com.example.foodalp.View.CityDetailView
 import com.example.foodalp.View.CityDetailViewAdmin
+import com.example.foodalp.View.DetailProfileView
+import com.example.foodalp.View.HomePage
+import com.example.foodalp.View.Launchview
+import com.example.foodalp.View.LoginView
 import com.example.foodalp.View.MenujuHomepage1View
 import com.example.foodalp.View.MenujuHomepage2View
 import com.example.foodalp.View.MenujuHomepage3View
 import com.example.foodalp.View.RegisterView
 import com.example.foodalp.View.RestaurantDetailView
+import com.example.foodalp.View.RestaurantDetailViewAdmin
 import com.example.foodalp.View.UpdateProfileView
 import com.example.foodalp.View.UpdateRestaurantView
 import com.example.foodalp.View.UpdateReview
 import com.example.foodalp.View.Welcomeview
-import com.example.foodalp.models.RestaurantModel
-import com.example.foodalp.viewmodel.RestaurantViewModel
 import com.example.foodalp.enums.ListScreen
 import com.example.foodalp.viewmodels.UserViewModel
-import com.google.gson.Gson
 import kotlinx.coroutines.delay
 
 
@@ -91,6 +89,17 @@ fun AppRouting() {
                 val role = backStackEntry.arguments?.getInt("role")
                 if (role != null) {
                     AddRestaurantView(navController, role)
+                }
+            }
+            composable(
+                route = ListScreen.AddRestaurantViewAdmin.name + "/{role}",
+                arguments = listOf(
+                    navArgument("role") { type = NavType.IntType }
+                )
+            ) { backStackEntry ->
+                val role = backStackEntry.arguments?.getInt("role")
+                if (role != null) {
+                    AddRestaurantViewAdmin(navController, role)
                 }
             }
             composable(ListScreen.UpdateProfileView.name) {
@@ -195,6 +204,32 @@ fun AppRouting() {
                 val role = backStackEntry.arguments?.getInt("role")
                 if (restaurantId != null && token != null && username != null && userId != null && role != null) {
                     RestaurantDetailView(
+                        navController,
+                        restaurantId,
+                        token,
+                        username,
+                        userId,
+                        role
+                    )
+                }
+            }
+            composable(
+                route = ListScreen.RestaurantDetailViewAdmin.name + "/{id}/{token}/{username}/{userId}/{role}",
+                arguments = listOf(
+                    navArgument("id") { type = NavType.IntType },
+                    navArgument("token") { type = NavType.StringType },
+                    navArgument("username") { type = NavType.StringType },
+                    navArgument("userId") { type = NavType.IntType },
+                    navArgument("role") { type = NavType.IntType }
+                )
+            ) { backStackEntry ->
+                val restaurantId = backStackEntry.arguments?.getInt("id")
+                val token = backStackEntry.arguments?.getString("token")
+                val username = backStackEntry.arguments?.getString("username")
+                val userId = backStackEntry.arguments?.getInt("userId")
+                val role = backStackEntry.arguments?.getInt("role")
+                if (restaurantId != null && token != null && username != null && userId != null && role != null) {
+                    RestaurantDetailViewAdmin(
                         navController,
                         restaurantId,
                         token,

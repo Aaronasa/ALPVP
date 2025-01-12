@@ -141,129 +141,125 @@ fun CityDetailViewAdmin(
                         modifier = Modifier.padding(start = 15.dp)
                     )
 
-                    SubcomposeAsyncImage(
-                        model = cityImage,
-                        contentDescription = "City Image",
-                        loading = {
-                            CircularProgressIndicator()
-                        },
-                        error = {
-                            Text("Image failed to load")
-                        },
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                    )
+//                    SubcomposeAsyncImage(
+//                        model = cityImage,
+//                        contentDescription = "City Image",
+//                        loading = {
+//                            CircularProgressIndicator()
+//                        },
+//                        error = {
+//                            Text("Image failed to load")
+//                        },
+//                        contentScale = ContentScale.Crop,
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .height(200.dp)
+//                            .clip(RoundedCornerShape(8.dp))
+//                    )
+//
+//                    TextField(
+//                        value = cityName1,
+//                        onValueChange = { cityName1 = it },
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .background(
+//                                color = Color(0x33000000),
+//                                shape = RoundedCornerShape(16.dp)
+//                            ),
+//                        colors = TextFieldDefaults.textFieldColors(
+//                            containerColor = Color.Transparent,
+//                            cursorColor = Color.Black,
+//                            focusedIndicatorColor = Color.Transparent,
+//                            unfocusedIndicatorColor = Color.Transparent
+//                        ),
+//                        textStyle = androidx.compose.ui.text.TextStyle(
+//                            fontSize = 20.sp
+//                        ),
+//                        singleLine = true
+//                    )
+//
+//                    Button(
+//                        onClick = { imagePickerLauncher.launch("image/*") },
+//                        modifier = Modifier
+//                            .wrapContentWidth()
+//                            .height(36.dp),
+//                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C254D))
+//                    ) {
+//                        Text("Upload Image", color = Color.White)
+//                    }
+//
+//                    imageUri?.let { uri ->
+//                        Spacer(modifier = Modifier.height(16.dp))
+//                        Image(
+//                            painter = rememberAsyncImagePainter(uri),
+//                            contentDescription = "Selected Image",
+//                            modifier = Modifier
+//                                .size(150.dp)
+//                                .clip(RoundedCornerShape(8.dp)),
+//                            contentScale = ContentScale.Crop
+//                        )
+//                    }
+//
+//                    val context = LocalContext.current
+//
+//                    Button(
+//                        onClick = {
+//                            selectedImageUri?.let { uri ->
+//                                val imagePart = createImagePart2(context, uri)
+//                                if (imagePart != null) {
+//                                    cityViewModel.updateCity(
+//                                        token = token,
+//                                        id = cityId,
+//                                        name = cityName1,
+//                                        context = context,
+//                                        imageUri = uri)
+//                                } else {
+//                                    Log.e("CityDetailViewAdmin", "Failed to create image part")
+//                                }
+//                            } ?: Log.e("CityDetailViewAdmin", "No image selected")
+//                        },
+//                        modifier = Modifier
+//                            .fillMaxWidth(0.6f),
+//                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C254D))
+//                    ) {
+//                        Text(
+//                            "Update",
+//                            color = Color.White,
+//                            fontFamily = customFontFamily,
+//                            fontSize = 20.sp
+//                        )
+//                    }
+//
+//                    Button(
+//                        onClick = {
+//                            cityViewModel.deleteCity(
+//                                token = token,
+//                                id = cityId,
+//                                onSuccess = {
+//                                    Log.d("CityDetailViewAdmin", "City deleted successfully")
+//                                    navController?.navigate("AdminPage") {
+//                                        popUpTo("CityDetailViewAdmin") { inclusive = true }
+//                                    }
+//                                },
+//                                onError = { errorMessage ->
+//                                    Log.e("CityDetailViewAdmin", "Failed to delete city: $errorMessage")
+//                                }
+//                            )
+//                        },
+//                        modifier = Modifier
+//                            .fillMaxWidth(0.6f),
+//                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C254D))
+//                    ) {
+//                        Text(
+//                            "Delete",
+//                            color = Color.White,
+//                            fontFamily = customFontFamily,
+//                            fontSize = 20.sp
+//                        )
+//                    }
 
-                    TextField(
-                        value = cityName1,
-                        onValueChange = { cityName1 = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                color = Color(0x33000000),
-                                shape = RoundedCornerShape(16.dp)
-                            ),
-                        colors = TextFieldDefaults.textFieldColors(
-                            containerColor = Color.Transparent,
-                            cursorColor = Color.Black,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
-                        ),
-                        textStyle = androidx.compose.ui.text.TextStyle(
-                            fontSize = 20.sp
-                        ),
-                        singleLine = true
-                    )
-
-                    Button(
-                        onClick = { imagePickerLauncher.launch("image/*") },
-                        modifier = Modifier
-                            .wrapContentWidth()
-                            .height(36.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C254D))
-                    ) {
-                        Text("Upload Image", color = Color.White)
-                    }
-
-                    imageUri?.let { uri ->
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Image(
-                            painter = rememberAsyncImagePainter(uri),
-                            contentDescription = "Selected Image",
-                            modifier = Modifier
-                                .size(150.dp)
-                                .clip(RoundedCornerShape(8.dp)),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-
-                    val context = LocalContext.current
-
-                    Button(
-                        onClick = {
-                            selectedImageUri?.let { uri ->
-                                val imagePart = createImagePart2(context, uri)
-                                if (imagePart != null) {
-                                    cityViewModel.updateCity(
-                                        token = token,
-                                        id = cityId,
-                                        name = cityName1,
-                                        context = context,
-                                        imageUri = uri)
-                                } else {
-                                    Log.e("CityDetailViewAdmin", "Failed to create image part")
-                                }
-                            } ?: Log.e("CityDetailViewAdmin", "No image selected")
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth(0.6f),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C254D))
-                    ) {
-                        Text(
-                            "Update",
-                            color = Color.White,
-                            fontFamily = customFontFamily,
-                            fontSize = 20.sp
-                        )
-                    }
-
-                    Button(
-                        onClick = {
-                            cityViewModel.deleteCity(
-                                token = token,
-                                id = cityId,
-                                onSuccess = {
-                                    Log.d("CityDetailViewAdmin", "City deleted successfully")
-                                    navController?.navigate("AdminPage") {
-                                        popUpTo("CityDetailViewAdmin") { inclusive = true }
-                                    }
-                                },
-                                onError = { errorMessage ->
-                                    Log.e("CityDetailViewAdmin", "Failed to delete city: $errorMessage")
-                                }
-                            )
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth(0.6f),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C254D))
-                    ) {
-                        Text(
-                            "Delete",
-                            color = Color.White,
-                            fontFamily = customFontFamily,
-                            fontSize = 20.sp
-                        )
-                    }
-
-                    Row(modifier = Modifier.padding(top = 80.dp)) {
-                        Column(
-
-//                verticalArrangement = Arrangement.Top,
-//                horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
+                    Row(modifier = Modifier.padding(top = 40.dp)) {
+                        Column{
                             val role = 2
                             Button(
                                 onClick = { navController.navigate(ListScreen.AddRestaurantView.name + "/${role}") },
@@ -343,7 +339,7 @@ fun RestaurantGridAdmin(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 RestaurantCard(
-                    onCardClick = { navController.navigate(ListScreen.RestaurantDetailView.name + "/${restaurant.id}/${token}/${username}/${userId}/${role}") },
+                    onCardClick = { navController.navigate(ListScreen.RestaurantDetailViewAdmin.name + "/${restaurant.id}/${token}/${username}/${userId}/${role}") },
 //                    onCardClick = { navController.navigate(ListScreen.UpdateRestaurantView.name + "/${restaurant.id}/${token}") },
                     navController = navController,
                     restaurant = restaurant,

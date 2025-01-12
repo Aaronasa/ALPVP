@@ -64,7 +64,7 @@ import com.example.foodalp.viewmodel.RestaurantViewModel
 import com.example.foodalp.viewmodel.ReviewViewModel
 
 @Composable
-fun RestaurantDetailView(
+fun RestaurantDetailViewAdmin(
     navController: NavController,
     restauranId: Int,
     token: String,
@@ -75,7 +75,7 @@ fun RestaurantDetailView(
     ReviewViewModel: ReviewViewModel = viewModel()
 ) {
 
-    val Review by ReviewViewModel.Review.collectAsState()
+    val Review by ReviewViewModel.admin.collectAsState()
     val UIstateReview by ReviewViewModel.UIstate.collectAsState()
 
     val ReviewAdmin by ReviewViewModel.admin.collectAsState()
@@ -90,34 +90,34 @@ fun RestaurantDetailView(
     var isDataLoaded by remember { mutableStateOf(false) }
     var isReviewLoaded by remember { mutableStateOf(false) }
 
-        LaunchedEffect(restauranId) {
-            Log.d("RestaurantDetailView", "Loading restaurant data for ID: $restauranId")
-            if (!isDataLoaded) {
-                Log.d(
-                    "RestaurantDetailView",
-                    "Check load data => id: $restauranId dan token: $token"
-                )
-                RestaurantviewModel.FetchRestaurantById(
-                    token = token,
-                    restaurantId = restauranId
-                ) { restaurant ->
-                    Log.d("RestaurantDetailView", "Loaded restaurant: $restaurant")
-                    restaurant?.let {
-                        restaurantName = it.name
-                        restaurantAddress = it.address
-                        restaurantPhone = it.phone
-                        image = it.image
-                        isDataLoaded = true
-                    }
+    LaunchedEffect(restauranId) {
+        Log.d("RestaurantDetailView", "Loading restaurant data for ID: $restauranId")
+        if (!isDataLoaded) {
+            Log.d(
+                "RestaurantDetailView",
+                "Check load data => id: $restauranId dan token: $token"
+            )
+            RestaurantviewModel.FetchRestaurantByIdAdmin(
+                token = token,
+                restaurantId = restauranId
+            ) { restaurant ->
+                Log.d("RestaurantDetailView", "Loaded restaurant: $restaurant")
+                restaurant?.let {
+                    restaurantName = it.name
+                    restaurantAddress = it.address
+                    restaurantPhone = it.phone
+                    image = it.image
+                    isDataLoaded = true
                 }
             }
-            if (!isReviewLoaded) {
-                ReviewViewModel.fetchAllReviews(
-                    token = token
-                )
-                isReviewLoaded = true
-            }
         }
+        if (!isReviewLoaded) {
+            ReviewViewModel.fetchAllReviewsAdmin(
+                token = token
+            )
+            isReviewLoaded = true
+        }
+    }
 
 
     Log.d("restaurantDetailView", "restaurantName: $restaurantName")
@@ -149,8 +149,7 @@ fun RestaurantDetailView(
                 modifier = Modifier.fillMaxSize()
             )
             IconButton(
-                onClick = { navController.navigate(ListScreen.CityDetailView.name + "/${restauranId}/${token}/${username}/${userId}/${role}") },
-//                "/{id}/{token}/{username}/{userId}/{role}"
+                onClick = { navController.navigate(ListScreen.CityDetailViewAdmin.name + "/${restauranId}/${token}/${username}/${userId}/${role}") },
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .padding(8.dp)
@@ -185,7 +184,51 @@ fun RestaurantDetailView(
                     color = Color.Black,
                     style = MaterialTheme.typography.titleMedium
                 )
+                Row {
+                    Button(
+                        onClick = { navController.navigate(ListScreen.UpdateRestaurantView.name + "/${restauranId}/${token}") },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C254D)),
+//                            contentPadding =  PaddingValues(4.dp),
+                        modifier = Modifier.padding(end = 8.dp),
+                    ) {
+                        Text(
+                            "Edit",
+                            color = Color.White,
+                            fontFamily = customFontFamily,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            if (restauranId != null && token.isNotEmpty()) {
+                                RestaurantviewModel.deleteRestaurant(restauranId, token)
+                                Toast.makeText(
+                                    navController.context,
+                                    "Restaurant Delete Successfully",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                navController.popBackStack()
+                            } else {
+                                Toast.makeText(
+                                    navController.context,
+                                    "Failed to delete. Invalid data.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C254D)),
+//                            contentPadding =  PaddingValues(6.dp)
+                    ) {
+                        Text(
+                            "Delete",
+                            color = Color.White,
+                            fontFamily = customFontFamily,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                }
             }
+
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -275,26 +318,6 @@ fun RestaurantDetailView(
                 color = Color.Black
             )
         }
-
-
-        Row(
-            horizontalArrangement = Arrangement.End
-        ) {
-            Button(
-                onClick = { navController.navigate(ListScreen.AddReview.name + "/${restauranId}/${token}/${username}/${userId}/${role}") },
-                modifier = Modifier
-                    .fillMaxWidth(0.6f)
-                    .padding(horizontal = 20.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(
-                        0xFF9C254D
-                    )
-                )
-            ) {
-                Text("Add Review", color = Color.White, fontSize = 16.sp)
-            }
-        }
-
         when (UIstateReview) {
             is ReviewState.Loading -> {
                 CircularProgressIndicator()  // Show loading while fetching restaurants
@@ -311,16 +334,16 @@ fun RestaurantDetailView(
                 if (reviews.isEmpty()) {
                     Text("No reviews available.")
                 } else {
-                        ReviewGrid(
-                            token = token,
-                            navController = navController,
-                            reviews = Review,
-                            restauranId = restauranId,
-                            role = role,
-                            userid = userId,
-                            username = username,
-                            reviewViewModel = ReviewViewModel
-                        )
+                    ReviewGridAdmin(
+                        token = token,
+                        navController = navController,
+                        reviews = Review,
+                        restauranId = restauranId,
+                        role = role,
+                        userid = userId,
+                        username = username,
+                        reviewViewModel = ReviewViewModel
+                    )
                 }
             }
 
@@ -332,7 +355,7 @@ fun RestaurantDetailView(
 }
 
 @Composable
-fun ReviewGrid(
+fun ReviewGridAdmin(
     token: String,
     navController: NavController,
     reviews: List<ReviewModel>,
@@ -353,7 +376,7 @@ fun ReviewGrid(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                ReviewCard(
+                ReviewCardAdmin(
                     UpdateClick = { navController.navigate(ListScreen.UpdateReviewView.name + "/${review.id}/${token}/${username}/${role}") },
                     navController = navController,
                     review = review,
