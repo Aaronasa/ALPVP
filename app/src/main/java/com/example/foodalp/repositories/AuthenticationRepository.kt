@@ -7,6 +7,7 @@ import LogoutResponse
 import RegisterRequest
 import RegisterResponse
 import UpdateUserRequest
+import UserModel
 import UserResponse
 import android.util.Log
 import com.example.foodalp.services.AuthenticationAPIService

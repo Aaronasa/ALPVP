@@ -7,10 +7,29 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,6 +45,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.foodalp.models.UpdateRestaurantRequest
 import com.example.foodalp.viewmodel.RestaurantViewModel
 import com.example.foodalp.R
+import com.example.foodalp.models.RestaurantModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,13 +53,15 @@ fun UpdateRestaurantView(
     navController: NavHostController,
     restaurantId: Int,
     token: String,
-    restaurantViewModel: RestaurantViewModel = viewModel()
+    RestaurantViewModel: RestaurantViewModel = viewModel(),
+
 ) {
     Log.d("UpdateRestaurantView", "Token: $token")
     Log.d("UpdateRestaurantView", "Restaurant ID: $restaurantId")
 
-    val restaurant by restaurantViewModel.selectedRestaurant.collectAsState()
-    val uiState by restaurantViewModel.uiState.collectAsState()
+    val Restaurant by RestaurantViewModel.RestaurantById.collectAsState()
+    val UIstate by RestaurantViewModel.UIstate.collectAsState()
+
 
     // State for form fields
     var restaurantName by remember { mutableStateOf("") }
@@ -49,19 +71,27 @@ fun UpdateRestaurantView(
     var isDataLoaded by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+    val uiState by RestaurantViewModel.uiState.collectAsState()
 
-    // Load restaurant data when the component is first displayed
     LaunchedEffect(restaurantId) {
+        Log.d("UpdateRestaurantView", "Loading restaurant data for ID: $restaurantId")
         if (!isDataLoaded) {
-            val loadedRestaurant = restaurantViewModel.fetchRestaurantById(token, restaurantId)
-            loadedRestaurant?.let {
-                restaurantName = it.name
-                restaurantAddress = it.address
-                restaurantPhone = it.phone
-                isDataLoaded = true
+            Log.d("UpdateRestaurantView", "Check load data => id: $restaurantId dan token: $token")
+            RestaurantViewModel.FetchRestaurantByIdAdmin(
+                token = token, // Replace with actual token logic
+                restaurantId = restaurantId
+            ) { restaurant ->
+                Log.d("UpdateRestaurantView", "Loaded restaurant: $restaurant")
+                restaurant?.let {
+                    restaurantName = it.name
+                    restaurantAddress = it.address
+                    restaurantPhone = it.phone
+                    isDataLoaded = true
+                }
             }
         }
     }
+
 
     // Image picker launcher
     val imagePickerLauncher = rememberLauncherForActivityResult(
@@ -78,7 +108,6 @@ fun UpdateRestaurantView(
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -103,7 +132,6 @@ fun UpdateRestaurantView(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Form Fields
             Column(
                 horizontalAlignment = Alignment.Start,
                 modifier = Modifier
@@ -171,34 +199,27 @@ fun UpdateRestaurantView(
                     val phone = restaurantPhone.trim()
 
                     if (name.isNotEmpty() && address.isNotEmpty() && phone.isNotEmpty()) {
-                        val imagePart = imageUri?.let { uri ->
-                            restaurantViewModel.createImagePart(
-                                context,
-                                uri
-                            )
-                        }
 
-                        val request = UpdateRestaurantRequest(
-                            id = restaurantId,
-                            name = name,
-                            address = address,
-                            phone = phone,
-                            image = imagePart
-                        )
+                            try {
+                                val imagePart = imageUri?.let { uri ->
+                                    RestaurantViewModel.createImagePart(context, uri)
+                                }
 
-                        restaurantViewModel.updateRestaurant(
-                            request,
-                            token = token
-                        )
-                        Toast.makeText(
-                            context,
-                            "Restaurant Updated Successfully",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        navController.popBackStack()
+                                val request = UpdateRestaurantRequest(
+                                    name = name,
+                                    address = address,
+                                    phone = phone,
+                                    image = imagePart
+                                )
+
+                                RestaurantViewModel.updateRestaurant(token, restaurantId, request)
+                                Toast.makeText(context, "Restaurant Updated Successfully", Toast.LENGTH_SHORT).show()
+                                navController.popBackStack()
+                            } catch (e: Exception) {
+                                Toast.makeText(context, e.message ?: "Update failed", Toast.LENGTH_SHORT).show()
+                            }
                     } else {
-                        Toast.makeText(context, "Please fill all the fields!", Toast.LENGTH_SHORT)
-                            .show()
+                        Toast.makeText(context, "Please fill all the fields!", Toast.LENGTH_SHORT).show()
                     }
                 },
                 modifier = Modifier.fillMaxWidth(0.6f),
@@ -219,3 +240,7 @@ fun UpdateRestaurantView(
         }
     }
 }
+
+
+
+

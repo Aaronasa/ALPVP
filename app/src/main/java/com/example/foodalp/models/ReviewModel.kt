@@ -12,8 +12,7 @@ data class ReviewModel(
     val restaurantId: Int,
     val content: String,
     val rating: Int,
-    val createdAt: String // Use ISO 8601 string for compatibility with JSON dates
-)
+    )
 
 // Request model for creating a review
 data class CreateReviewRequest(
@@ -25,7 +24,7 @@ data class CreateReviewRequest(
 
 // Request model for updating a review
 data class UpdateReviewRequest(
-    val id: Int,
+//    val id: Int,
     val content: String? = null, // Optional for partial updates
     val rating: Int? = null      // Optional for partial updates
 )

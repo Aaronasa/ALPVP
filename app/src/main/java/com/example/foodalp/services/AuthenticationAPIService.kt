@@ -1,12 +1,15 @@
 package com.example.foodalp.services
 
 
+import DeleteResponse
 import EmailRequest
 import LoginRequest
 import LoginResponse
+import LogoutResponse
 import RegisterRequest
 import RegisterResponse
 import UpdateUserRequest
+import UserModel
 import UserResponse
 import android.util.Log
 import retrofit2.http.Body

@@ -1,4 +1,5 @@
-package com.example.foodalp.uiStates
+package com.example.foodalp.uistates
+
 
 sealed class UserStatusUIState {
     object Idle : UserStatusUIState() // Initial state or no actions

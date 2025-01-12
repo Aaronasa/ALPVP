@@ -10,7 +10,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodalp.AppContainer
-import com.example.foodalp.uiStates.UserStatusUIState
+import com.example.foodalp.uistates.UserStatusUIState
 import com.example.foodalp.uistates.UserUIState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

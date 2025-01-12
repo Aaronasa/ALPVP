@@ -22,7 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.foodalp.R
 import com.example.foodalp.enums.ListScreen
-import com.example.foodalp.uiStates.UserStatusUIState
+import com.example.foodalp.uistates.UserStatusUIState
 import com.example.foodalp.viewmodels.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)

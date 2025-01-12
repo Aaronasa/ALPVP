@@ -26,7 +26,7 @@ import com.example.foodalp.viewmodel.ReviewViewModel
 import android.widget.Toast
 
 @Composable
-fun AddReview(
+fun AddReviewAdmin(
     navController: NavHostController,
     restaurantId: Int,
     token: String,
@@ -139,13 +139,13 @@ fun AddReview(
 
                         if (token != null) {
 
-                                ReviewViewModel.createReview(
-                                    token,
-                                    userId,
-                                    restaurantId,
-                                    content,
-                                    rating
-                                )
+                            ReviewViewModel.createReviewAdmin(
+                                token,
+                                userId,
+                                restaurantId,
+                                content,
+                                rating
+                            )
 
                         }
                         Toast.makeText(
@@ -182,8 +182,4 @@ fun AddReview(
     }
 }
 
-//@Preview(showBackground = true, showSystemUi = true)
-//@Composable
-//fun PreviewAddReview() {
-//    AddReview()
-//}
+

@@ -14,6 +14,13 @@ enum class ListScreen {
     DetailProfileView,
     AdminPage,
     AddRestaurantView,
-    UpdateRestaurantView
-
+    UpdateRestaurantView,
+    AddCityView,
+    CityDetailView,
+    CityDetailViewAdmin,
+    AddReview,
+    RestaurantDetailView,
+    UpdateReviewView,
+    RestaurantDetailViewAdmin,
+    AddRestaurantViewAdmin,
 }

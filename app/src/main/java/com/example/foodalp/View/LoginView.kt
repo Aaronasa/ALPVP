@@ -34,7 +34,7 @@ import androidx.navigation.NavHostController
 import com.example.foodalp.R
 import com.example.foodalp.enums.ListScreen
 import com.example.foodalp.viewmodels.UserViewModel
-import com.example.foodalp.uiStates.UserStatusUIState
+import com.example.foodalp.uistates.UserStatusUIState
 import java.time.format.TextStyle
 import androidx.compose.ui.platform.LocalContext
 

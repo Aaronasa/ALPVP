@@ -1,5 +1,6 @@
 package com.example.foodalp.uistates
 
+
 import com.example.foodalp.models.RestaurantModel
 
 sealed interface RestaurantByIdState {

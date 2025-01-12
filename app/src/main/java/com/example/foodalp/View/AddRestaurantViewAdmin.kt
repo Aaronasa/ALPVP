@@ -10,19 +10,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,18 +19,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.foodalp.R
-import com.example.foodalp.models.CreateCityRequest
-import com.example.foodalp.viewmodel.CityViewModel
+import com.example.foodalp.models.CreateRestaurantRequest
+import com.example.foodalp.viewmodel.RestaurantViewModel
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -49,19 +36,23 @@ import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddCityView(
-    navController: androidx.navigation.NavHostController,
-    viewModel: CityViewModel = viewModel()
+fun AddRestaurantViewAdmin(
+    navController: NavHostController,
+    role: Int,
+    viewModel: RestaurantViewModel = viewModel()
 ) {
-    var cityName by remember { mutableStateOf("") }
+    var restaurantName by remember { mutableStateOf("") }
+    var restaurantAddress by remember { mutableStateOf("") }
+    var restaurantPhone by remember { mutableStateOf("") }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     val token = getUserToken()
-    val uiState by viewModel.uiState.collectAsState()
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri -> imageUri = uri }
     )
+
+    val uiState by viewModel.uiState.collectAsState()
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -76,7 +67,7 @@ fun AddCityView(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Header
+            // Top Background Shape
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -88,7 +79,7 @@ fun AddCityView(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    "Add City",
+                    "Add Restaurant",
                     fontSize = 36.sp,
                     color = Color.White
                 )
@@ -96,7 +87,6 @@ fun AddCityView(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Input Fields
             Column(
                 horizontalAlignment = Alignment.Start,
                 modifier = Modifier
@@ -104,15 +94,31 @@ fun AddCityView(
                     .fillMaxWidth()
             ) {
                 TextField(
-                    value = cityName,
-                    onValueChange = { cityName = it },
-                    label = { Text("City Name") },
+                    value = restaurantName,
+                    onValueChange = { restaurantName = it },
+                    label = { Text("Restaurant Name") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                TextField(
+                    value = restaurantAddress,
+                    onValueChange = { restaurantAddress = it },
+                    label = { Text("Address") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                TextField(
+                    value = restaurantPhone,
+                    onValueChange = { restaurantPhone = it },
+                    label = { Text("Phone Number") },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "City Image",
+                    text = "Restaurant Image",
                     fontSize = 20.sp,
                     color = Color(0xFF0F0A3F),
                     modifier = Modifier.padding(bottom = 4.dp, start = 5.dp)
@@ -141,29 +147,33 @@ fun AddCityView(
             }
 
             Spacer(modifier = Modifier.height(100.dp))
-
-            // Submit Button
             val context = LocalContext.current
             Button(
                 onClick = {
-                    val name = cityName.trim()
-                    val imageUri = imageUri
+                    val name = restaurantName.trim()
+                    val address = restaurantAddress.trim()
+                    val phone = restaurantPhone.trim()
+                    val imageUri = imageUri // Uri object, not string
 
-                    if (name.isNotEmpty() && imageUri != null) {
-                        val imagePart = createImagePart1(context, imageUri)
+                    // Validate input
+                    if (name.isNotEmpty() && address.isNotEmpty() && phone.isNotEmpty() && imageUri != null) {
+                        val imagePart = createImagePartAdmin(context, imageUri) // Convert Uri to MultipartBody.Part
 
-
-                        val request = CreateCityRequest(
+                        val request = CreateRestaurantRequest(
                             name = name,
-                            image = imagePart
+                            address = address,
+                            phone = phone,
+                            image = imagePart // Pass MultipartBody.Part
                         )
 
                         if (token != null) {
-                            viewModel.createCity(token, context, request)
+
+                            viewModel.createRestaurantAdmin(token, context, request)
+
                         }
                         Toast.makeText(
                             navController.context,
-                            "City Created Successfully",
+                            "Restaurant Created Successfully",
                             Toast.LENGTH_SHORT
                         ).show()
                         navController.popBackStack()
@@ -181,6 +191,7 @@ fun AddCityView(
                 )
             }
 
+
             if (uiState.isLoading) {
                 CircularProgressIndicator()
             } else if (uiState.errorMessage != null) {
@@ -190,16 +201,18 @@ fun AddCityView(
     }
 }
 
-fun createImagePart1(context: Context, imageUri: Uri): MultipartBody.Part {
-    val file = File(getRealPathFromURI1(context, imageUri))
-    val requestBody = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
+fun createImagePartAdmin(context: Context, imageUri: Uri): MultipartBody.Part {
+    val file = File(getRealPathFromURIAdmin(context, imageUri)) // Convert URI to actual file
+    val requestBody = file.asRequestBody("image/jpeg".toMediaTypeOrNull()) // Adjust content type accordingly
     return MultipartBody.Part.createFormData("image", file.name, requestBody)
 }
 
-fun getRealPathFromURI1(context: Context, uri: Uri): String? {
+fun getRealPathFromURIAdmin(context: Context, uri: Uri): String? {
     var filePath: String? = null
 
+    // Check if the URI is a content URI
     if (uri.scheme == "content") {
+        // Query the content resolver for the file path
         val proj = arrayOf(MediaStore.Images.Media.DATA)
         val cursor = context.contentResolver.query(uri, proj, null, null, null)
 
@@ -216,8 +229,3 @@ fun getRealPathFromURI1(context: Context, uri: Uri): String? {
     return filePath
 }
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun AddCityPreView() {
-    AddCityView(navController = rememberNavController())
-}

@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.foodalp.R
 import com.example.foodalp.uistates.UserUIState
 import com.example.foodalp.viewmodels.UserViewModel
 import android.content.Context
@@ -33,27 +32,52 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.compose.rememberNavController
+import com.example.foodalp.R
+
+
+import com.example.foodalp.models.ReviewModel
+import com.example.foodalp.uistates.ReviewState
 import com.example.foodalp.enums.ListScreen
+import com.example.foodalp.models.CityModel
 import com.example.foodalp.models.RestaurantModel
-import com.example.foodalp.ui.state.RestaurantState
+import com.example.foodalp.uistates.CityState
+import com.example.foodalp.uistates.RestaurantState
+import com.example.foodalp.viewmodel.CityViewModel
 import com.example.foodalp.viewmodel.RestaurantViewModel
+import com.example.foodalp.viewmodel.ReviewViewModel
+import com.google.gson.Gson
 
 @Composable
 fun HomePage(
     navController: NavController,
     userViewModel: UserViewModel = viewModel(),
-    restaurantViewModel: RestaurantViewModel = viewModel()
+    restaurantViewModel: RestaurantViewModel = viewModel(),
+    reviewViewModel: ReviewViewModel = viewModel(),
+    cityViewModel: CityViewModel = viewModel()
 ) {
 //    for restaurant
-    val Restaurant by restaurantViewModel.restaurants.collectAsState()
-    val UIstate by restaurantViewModel.uiState.collectAsState()
+
+    val City by cityViewModel.City.collectAsState()
+
+    val CityUIstate by cityViewModel.UIstate.collectAsState()
+
+    val restoAdmin by restaurantViewModel.admin.collectAsState()
+
+
+//    for Review
+    val Review by reviewViewModel.Review.collectAsState()
+    val UIstateReview by reviewViewModel.UIstate.collectAsState()
+
+//    val RestaurantbyId by restaurantViewModel.RestaurantById.collectAsState()
+    val uiState by restaurantViewModel.UIstate.collectAsState()
 
     val context = LocalContext.current  // Get context here
-    val restaurantViewModel = RestaurantViewModel()
-    val uiState by restaurantViewModel.uiState.collectAsState()
+//    val restaurantViewModel = RestaurantViewModel()
+//    val uiState by restaurantViewModel.uiState.collectAsState()
 
     // Assume that you retrieve the token and email from somewhere (e.g., shared preferences or session storage)
     val token = getUserToken()  // Replace this with your logic to get the token
@@ -73,17 +97,19 @@ fun HomePage(
     Log.d("HomePage", "Current state: ${userState.value}")
 
 
+
+
     LaunchedEffect(Unit) {
         if (token != null) {
             restaurantViewModel.fetchAllRestaurants(token)
+            cityViewModel.fetchAllCities(token)
         }
     }
 
     when (val state = userState.value) {
         is UserUIState.Loading -> {
             Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
             }
@@ -137,16 +163,15 @@ fun HomePage(
                                     )
                                 }
 
-                                Box(
-                                    modifier = Modifier
-                                        .size(80.dp)
-                                        .clip(CircleShape)
-                                        .background(Color(0xFF991E3D))
-                                        .padding(8.dp)
-                                        .clickable() {
-                                            // Navigasi ke UpdateUserView
-                                            navController.navigate("DetailProfileView")
-                                        }
+                                Box(modifier = Modifier
+                                    .size(80.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFF991E3D))
+                                    .padding(8.dp)
+                                    .clickable() {
+                                        // Navigasi ke UpdateUserView
+                                        navController.navigate("DetailProfileView")
+                                    }
 
                                 ) {
                                     Image(
@@ -160,81 +185,44 @@ fun HomePage(
                             }
 
                             Spacer(modifier = Modifier.height(20.dp))
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 20.dp)
-                                    .height(56.dp)
-                                    .background(
-                                        color = Color.White,
-                                        shape = RoundedCornerShape(12.dp)
-                                    ),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(horizontal = 16.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.baseline_search_24),
-                                        contentDescription = "Search Icon",
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Text(
-                                        text = "Where do you want to go?",
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.Normal,
-                                        color = Color(0xFFB3B3B3)
-                                    )
-                                }
-                            }
-                            Button(
-                                onClick = { navController.navigate(ListScreen.AddRestaurantView.name) },
-                                modifier = Modifier
-                                    .fillMaxWidth(0.6f)
-                                    .padding(horizontal = 20.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(
-                                        0xFF9C254D
-                                    )
-                                )
-                            ) {
-                                Text("Add Restaurant", color = Color.White, fontSize = 16.sp)
-                            }
-                            when (UIstate) {
-                                is RestaurantState.Loading -> {
+                            when (CityUIstate) {
+                                is CityState.Loading -> {
                                     CircularProgressIndicator()  // Show loading while fetching restaurants
                                 }
 
-                                is RestaurantState.Failed -> {
+                                is CityState.Failed -> {
                                     val errorMessage =
-                                        (UIstate as RestaurantState.Failed).errorMessage
+                                        (CityUIstate as CityState.Failed).errorMessage
                                     Text(errorMessage)  // Display the error message
                                 }
 
-                                is RestaurantState.Success -> {
-                                    val restaurants = (UIstate as RestaurantState.Success).data
-                                    if (restaurants.isEmpty()) {
-                                        Text("No restaurants available.")
+                                is CityState.Success -> {
+                                    val cities =
+                                        (CityUIstate as CityState.Success).data
+                                    if (cities.isEmpty()) {
+                                        Text("No cities available.")
                                     } else {
                                         if (token != null) {
-                                            RestaurantGrid(
+                                            CityGrid(
                                                 token = token,
                                                 navController = navController,
-                                                restaurants = Restaurant,  // Pass the fetched restaurant data
-                                                restaurantViewModel = restaurantViewModel
+                                                cities = City,  // Pass the fetched restaurant data
+                                                cityViewModel = cityViewModel,
+                                                username = it.username,
+                                                role = it.roleId,
+                                                userId = it.id,
                                             )
                                         }
                                     }
                                 }
 
-                                is RestaurantState.Start -> {
+                                is CityState.Start -> {
                                     Text("Welcome!")  // Initial state or any placeholder UI
                                 }
                             }
+
+
+
                         }
                     }
                 }
@@ -243,8 +231,7 @@ fun HomePage(
 
         is UserUIState.Error -> {
             Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "Error: ${state.message}",
@@ -261,75 +248,40 @@ fun HomePage(
 }
 
 
-@Composable
-fun SearchBar() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-            .height(56.dp)
-            .background(
-                color = Color.White,
-                shape = RoundedCornerShape(12.dp)
-            ),
-        contentAlignment = Alignment.CenterStart
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.baseline_search_24),
-                contentDescription = "Search Icon",
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                text = "Where do you want to go?",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Normal,
-                color = Color(0xFFB3B3B3)
-            )
-        }
-    }
-}
 
 @Composable
-fun RestaurantGrid(
-    token : String,
+fun CityGrid(
+    token: String,
     navController: NavController,
-    restaurants: List<RestaurantModel>,
-    restaurantViewModel: RestaurantViewModel,
+    cities: List<CityModel>,
+    cityViewModel: CityViewModel,
+    username: String,
+    role: Int,
+    userId: Int,
     modifier: Modifier = Modifier
 ) {
-    // Group restaurants into pairs (two restaurants per row)
-    val restaurantPairs = restaurants.chunked(1)
-
-    LazyColumn(
+    LazyRow (
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp) // Spacing between items
     ) {
-        items(restaurants) { restaurant ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                RestaurantCard(
-                    onCardClick = {navController?.navigate(ListScreen.UpdateRestaurantView.name + "/${restaurant.id}/${token}")},
-                    navController = navController,
-                    restaurant = restaurant,
-                    viewModel = restaurantViewModel,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(8.dp)
-                )
-            }
+        items(cities) { city ->
+            Log.d("CityGrid1", "Cities: ${cities.size} - $cities")
+            CityCard(
+                navController = navController,
+                city = city,
+                viewModel = cityViewModel,
+                username = username,
+                role = role,
+                userId = userId,
+                modifier = Modifier
+                    .padding(8.dp)
+            )
         }
     }
 }
+
 
 // Retrieve token from SharedPreferences
 @Composable
@@ -347,8 +299,8 @@ fun getUserEmail(): String? {
 }
 
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PreviewHomepage() {
-    HomePage(navController = rememberNavController())
-}
+//@Preview(showBackground = true, showSystemUi = true)
+//@Composable
+//fun PreviewHomepage() {
+//    HomePage(navController = rememberNavController())
+//}
