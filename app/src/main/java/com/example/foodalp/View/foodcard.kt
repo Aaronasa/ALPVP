@@ -2,6 +2,7 @@ package com.example.foodalp.View
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,16 +36,22 @@ import java.time.format.TextStyle
 
 
 @Composable
-fun FoodCard() {
+fun FoodCard(
+    foodName: String, // Nama makanan
+    foodImageRes: Int, // Resource ID untuk gambar makanan
+    onCardClick: () -> Unit, // Callback untuk tindakan klik
+    modifier: Modifier = Modifier // Modifier opsional
+) {
     val customFontFamily = FontFamily(
         Font(R.font.jua)
     )
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .padding(16.dp) // Outer padding to separate from screen edges
             .clip(RoundedCornerShape(16.dp)) // Rounded corners for the card
             .background(Color.White) // Background color of the card
+            .clickable() { onCardClick() } // Handle card click
             .padding(8.dp) // Padding inside the card for a clean layout
     ) {
         Column(
@@ -52,8 +59,8 @@ fun FoodCard() {
         ) {
             // Image section
             Image(
-                painter = painterResource(id = R.drawable.ic_launcher_background), // Replace with your image
-                contentDescription = "Lake Braise",
+                painter = painterResource(id = foodImageRes), // Replace with your image
+                contentDescription = foodName,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -61,16 +68,15 @@ fun FoodCard() {
                     .clip(RoundedCornerShape(12.dp)) // Rounded corners for the image
             )
 
-            // Text
+            // Text section
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 5.dp, top = 14.dp, end = 5.dp),
-//                verticalArrangement = Arrangement.Center,
             ) {
                 // Title text
                 Text(
-                    text = "Lake Braise",
+                    text = foodName,
                     color = Color.Black,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
@@ -81,9 +87,10 @@ fun FoodCard() {
     }
 }
 
-@Preview
-@Composable
-fun PreviewFoodCard() {
-    FoodCard()
-}
+
+//@Preview
+//@Composable
+//fun PreviewFoodCard() {
+//    FoodCard()
+//}
 

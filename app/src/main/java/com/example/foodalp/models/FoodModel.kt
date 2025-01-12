@@ -1,94 +1,50 @@
 package com.example.foodalp.models
 
-import com.google.gson.annotations.SerializedName
-
-// Main response for food-related operations
+// Response model for Food-related API calls
 data class FoodResponse(
-    @SerializedName("data")
-    val data: FoodModel? // Null if no food found
+    val data: FoodModel? // If no record is found, data can be null
 )
 
-// Individual food data model
+// Model for individual food data
 data class FoodModel(
-    @SerializedName("id")
     val id: Int,
-
-    @SerializedName("name")
     val name: String,
-
-    @SerializedName("description")
     val description: String,
-
-    @SerializedName("ingredients")
     val ingredients: String,
-
-    @SerializedName("image")
     val image: String,
-
-    @SerializedName("categoryId")
     val categoryId: Int,
-
-    @SerializedName("cityId")
     val cityId: Int
 )
 
-// Request model to create food
+// Request model for creating a food
 data class CreateFoodRequest(
-    @SerializedName("name")
     val name: String,
-
-    @SerializedName("description")
     val description: String,
-
-    @SerializedName("ingredients")
     val ingredients: String,
-
-    @SerializedName("image")
     val image: String,
-
-    @SerializedName("categoryId")
     val categoryId: Int,
-
-    @SerializedName("cityId")
     val cityId: Int
 )
+
+// Response model for creating a food
 data class CreateFoodResponse(
-    @SerializedName("success")
     val success: Boolean,
-
-    @SerializedName("message")
     val message: String,
-
-    @SerializedName("data")
-    val food: FoodModel // Or whatever the response data looks like
+    val data: FoodModel // Contains the newly created food record
 )
 
-// Request model to update food
+// Request model for updating a food
 data class UpdateFoodRequest(
-    @SerializedName("id")
     val id: Int,
-
-    @SerializedName("name")
     val name: String? = null,
-
-    @SerializedName("description")
     val description: String? = null,
-
-    @SerializedName("ingredients")
     val ingredients: String? = null,
-
-    @SerializedName("image")
     val image: String? = null,
-
-    @SerializedName("categoryId")
     val categoryId: Int? = null,
-
-    @SerializedName("cityId")
     val cityId: Int? = null
 )
 
-// Response for all foods (from "readall" endpoint)
+// Response model for fetching all foods
 data class GetAllFoodsResponse(
-    @SerializedName("data")
-    val data: List<FoodModel>
+    val data: List<FoodModel> // List of food records
 )

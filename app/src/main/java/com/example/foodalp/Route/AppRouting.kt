@@ -1,5 +1,6 @@
 package com.example.foodalp.Route
 
+
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -127,6 +128,32 @@ fun AppRouting() {
 
                 if (restaurantId != null && token != null) {
                     UpdateRestaurantView(navController, restaurantId, token)
+                }
+            }
+            composable(
+                route = ListScreen.AddFoodView.name + "/{id}/{token}/{username}/{userId}/{role}",
+                arguments = listOf(
+                    navArgument("id") { type = NavType.IntType },
+                    navArgument("token") { type = NavType.StringType },
+                    navArgument("username") { type = NavType.StringType },
+                    navArgument("userId") { type = NavType.IntType },
+                    navArgument("role") { type = NavType.IntType }
+                )
+            ) { backStackEntry ->
+                val foodId = backStackEntry.arguments?.getInt("id")
+                val token = backStackEntry.arguments?.getString("token")
+                val username = backStackEntry.arguments?.getString("username")
+                val userId = backStackEntry.arguments?.getInt("userId")
+                val role = backStackEntry.arguments?.getInt("role")
+                if (foodId != null && token != null && username != null && userId != null && role != null) {
+                    AddFoodView(
+                        navController = navController,
+                        foodId = foodId,
+                        token = token,
+                        username = username,
+                        userId = userId,
+                        role = role
+                    )
                 }
             }
             composable(

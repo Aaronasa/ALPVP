@@ -40,12 +40,19 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.foodalp.R
+import com.example.foodalp.View.FoodCard
+import com.example.foodalp.View.RestaurantCard
+import com.example.foodalp.View.getUserToken
 import com.example.foodalp.enums.ListScreen
+import com.example.foodalp.models.FoodModel
 import com.example.foodalp.models.RestaurantModel
 import com.example.foodalp.uistates.CityState
+import com.example.foodalp.uistates.FoodState
 import com.example.foodalp.uistates.RestaurantState
 import com.example.foodalp.viewmodel.CityViewModel
+import com.example.foodalp.viewmodel.FoodViewModel
 import com.example.foodalp.viewmodel.RestaurantViewModel
+
 
 @Composable
 fun CityDetailView(
@@ -55,23 +62,26 @@ fun CityDetailView(
     username: String,
     userId: Int,
     role: Int,
+    foodViewModel: FoodViewModel = viewModel(),
     restaurantViewModel: RestaurantViewModel = viewModel(),
     cityViewModel: CityViewModel = viewModel()
 ) {
     val token1 = getUserToken()
-    val Restaurant by restaurantViewModel.Restaurant.collectAsState()
-    val RestaurantUIstate by restaurantViewModel.UIstate.collectAsState()
-    // State initialization
+
+    val foods by foodViewModel.foodList.collectAsState()
+    val foodUIState by foodViewModel.uiState.collectAsState()
+
+    val restaurants by restaurantViewModel.Restaurant.collectAsState()
+    val restaurantUIState by restaurantViewModel.UIstate.collectAsState()
+
     var isCityDataLoaded by remember { mutableStateOf(false) }
-    var isAttractionsLoaded by remember { mutableStateOf(false) }
+    var isFoodLoaded by remember { mutableStateOf(false) }
     var isRestaurantLoaded by remember { mutableStateOf(false) }
     var cityName by remember { mutableStateOf("") }
     var cityImage by remember { mutableStateOf("") }
 
-    // Observing city state
     val cityState = cityViewModel.cityState.observeAsState(CityState.Loading)
 
-    // LaunchedEffect for loading city details
     LaunchedEffect(cityId) {
         Log.d("CityDetailView", "Loading city data for ID: $cityId")
         if (!isCityDataLoaded) {
@@ -87,22 +97,17 @@ fun CityDetailView(
             }
         }
 
-        if (!isAttractionsLoaded) {
-            // Assuming you have an AttractionsViewModel (replace with actual logic)
-            // attractionsViewModel.fetchAllAttractions(token)
-            isAttractionsLoaded = true
+        if (!isFoodLoaded) {
+            foodViewModel.fetchAllFoods(token)
+            isFoodLoaded = true
         }
 
-        if(!isRestaurantLoaded){
+        if (!isRestaurantLoaded) {
             restaurantViewModel.fetchAllRestaurants(token)
             isRestaurantLoaded = true
         }
     }
 
-    Log.d("CityDetailView", "Loading city data for ID: $cityName")
-    Log.d("CityDetailView", "Loading city data for ID: $cityImage")
-
-    // Custom font family
     val customFontFamily = FontFamily(Font(R.font.jua))
 
     Column(
@@ -111,7 +116,6 @@ fun CityDetailView(
             .background(Color.White)
     ) {
         Box {
-            // Background Image
             Image(
                 painter = painterResource(id = R.drawable.group_8),
                 contentDescription = "Background orange",
@@ -119,12 +123,11 @@ fun CityDetailView(
                 contentScale = ContentScale.Crop
             )
 
-            // Text Overlay
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp),
-                contentAlignment = Alignment.TopStart
+                contentAlignment = Alignment.TopStart // Semua elemen akan disusun dari bagian atas
             ) {
                 Row {
                     Column {
@@ -148,12 +151,19 @@ fun CityDetailView(
                     }
                 }
                 Row(modifier = Modifier.padding(top = 80.dp)) {
-                    Column(
+                    Column {
+                        Button(
+                            onClick = { navController.navigate(ListScreen.AddFoodView.name + "/${role}") },
+                            modifier = Modifier
+                                .fillMaxWidth() // Perluas lebar untuk menguji
+                                .padding(horizontal = 20.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF9C254D)
+                            )
+                        ) {
+                            Text("Add Food", color = Color.White, fontSize = 16.sp)
+                        }
 
-//                verticalArrangement = Arrangement.Top,
-//                horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        val role = 2
                         Button(
                             onClick = { navController.navigate(ListScreen.AddRestaurantView.name + "/${role}") },
                             modifier = Modifier
@@ -167,20 +177,58 @@ fun CityDetailView(
                         ) {
                             Text("Add Restaurant", color = Color.White, fontSize = 16.sp)
                         }
-                        when (RestaurantUIstate) {
+
+                        when (foodUIState) {
+                            is FoodState.Loading -> {
+                                CircularProgressIndicator()
+                            }
+
+                            is FoodState.Failed -> {
+                                val errorMessage =
+                                    (foodUIState as FoodState.Failed).errorMessage
+                                Text(errorMessage)
+                            }
+
+                            is FoodState.Success -> {
+                                val foods =
+                                    (foodUIState as FoodState.Success).data
+                                if (foods.isEmpty()) {
+                                    Text("No foods available.")
+                                } else {
+                                    if (token != null) {
+                                        Log.d("HomePage", "Role Id: ${role}")
+                                        FoodGrid(
+                                            token = token,
+                                            navController = navController,
+                                            foods = foods,
+                                            username = username,
+                                            role = role,
+                                            userId = userId,
+                                            foodViewModel = foodViewModel
+                                        )
+                                    }
+                                }
+                            }
+
+                            is FoodState.Start -> {
+                                Text("Welcome!")
+                            }
+                        }
+
+                        when (restaurantUIState) {
                             is RestaurantState.Loading -> {
-                                CircularProgressIndicator()  // Show loading while fetching restaurants
+                                CircularProgressIndicator()
                             }
 
                             is RestaurantState.Failed -> {
                                 val errorMessage =
-                                    (RestaurantUIstate as RestaurantState.Failed).errorMessage
-                                Text(errorMessage)  // Display the error message
+                                    (restaurantUIState as RestaurantState.Failed).errorMessage
+                                Text(errorMessage)
                             }
 
                             is RestaurantState.Success -> {
                                 val restaurants =
-                                    (RestaurantUIstate as RestaurantState.Success).data
+                                    (restaurantUIState as RestaurantState.Success).data
                                 if (restaurants.isEmpty()) {
                                     Text("No restaurants available.")
                                 } else {
@@ -189,7 +237,7 @@ fun CityDetailView(
                                         RestaurantGrid(
                                             token = token,
                                             navController = navController,
-                                            restaurants = Restaurant,
+                                            restaurants = restaurants,
                                             username = username,
                                             role = role,
                                             userId = userId,
@@ -200,16 +248,52 @@ fun CityDetailView(
                             }
 
                             is RestaurantState.Start -> {
-                                Text("Welcome!")  // Initial state or any placeholder UI
+                                Text("Welcome!")
                             }
                         }
                     }
                 }
             }
-
         }
+    }
+}
 
-
+@Composable
+fun FoodGrid(
+    token: String,
+    navController: NavController,
+    foods: List<FoodModel>,
+    username: String,
+    role: Int,
+    userId: Int,
+    foodViewModel: FoodViewModel,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
+    ) {
+        items(foods) { food ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                FoodCard(
+                    foodName = food.name,
+                    foodImageRes = R.drawable.ic_launcher_background, // Replace with food.image if dynamic image is used
+                    onCardClick = {
+                        navController.navigate(
+                            ListScreen.FoodDetailView.name + "/${food.id}/${token}/${username}/${userId}/${role}"
+                        )
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(8.dp)
+                )
+            }
+        }
     }
 }
 
@@ -247,4 +331,3 @@ fun RestaurantGrid(
         }
     }
 }
-
