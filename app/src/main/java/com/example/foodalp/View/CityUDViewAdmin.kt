@@ -1,3 +1,4 @@
+
 package com.example.foodalp.View
 
 import android.content.Context
@@ -44,19 +45,15 @@ import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CityDetailViewAdmin(
+fun CityUDViewAdmin(
     cityId: Int,
     token: String,
     navController: NavController,
     username: String,
     userId: Int,
     role: Int,
-    restaurantViewModel: RestaurantViewModel = viewModel(),
     cityViewModel: CityViewModel = viewModel()
 ) {
-
-    val Restaurant by restaurantViewModel.admin.collectAsState()
-    val RestaurantUIstate by restaurantViewModel.UIstate.collectAsState()
 
     // State for selected image URI
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
@@ -77,9 +74,6 @@ fun CityDetailViewAdmin(
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var isRestaurantLoaded by remember { mutableStateOf(false) }
 
-    // Observing city state
-    val cityState by cityViewModel.cityState.observeAsState(CityState.Loading)
-
     // LaunchedEffect for loading city details
     LaunchedEffect(cityId) {
         if (!isCityDataLoaded) {
@@ -91,10 +85,6 @@ fun CityDetailViewAdmin(
                     isCityDataLoaded = true
                 } ?: Log.e("CityDetailViewAdmin", "Failed to load city details")
             }
-        }
-        if (!isRestaurantLoaded) {
-            restaurantViewModel.fetchAllRestaurantsAdmin(token)
-            isRestaurantLoaded = true
         }
     }
 
@@ -157,70 +147,102 @@ fun CityDetailViewAdmin(
                             .clip(RoundedCornerShape(8.dp))
                     )
 
-                    Spacer(modifier = Modifier.height(6.dp))
+                    TextField(
+                        value = cityName1,
+                        onValueChange = { cityName1 = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = Color(0x33000000),
+                                shape = RoundedCornerShape(16.dp)
+                            ),
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = Color.Transparent,
+                            cursorColor = Color.Black,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        textStyle = androidx.compose.ui.text.TextStyle(
+                            fontSize = 20.sp
+                        ),
+                        singleLine = true
+                    )
 
-                    Button(onClick = {
-                        navController.navigate(
-                            "CityUDViewAdmin/${cityId}/${token}/${username}/${userId}/${role}"
-                        )
-                    }) {
-                        Text("Update and Delete City")
+                    Button(
+                        onClick = { imagePickerLauncher.launch("image/*") },
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .height(36.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C254D))
+                    ) {
+                        Text("Upload Image", color = Color.White)
                     }
 
+                    imageUri?.let { uri ->
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Image(
+                            painter = rememberAsyncImagePainter(uri),
+                            contentDescription = "Selected Image",
+                            modifier = Modifier
+                                .size(150.dp)
+                                .clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
 
-                    Row(modifier = Modifier.padding(top = 40.dp)) {
-                        Column{
-                            val role = 2
-                            Button(
-                                onClick = { navController.navigate(ListScreen.AddRestaurantView.name + "/${role}") },
-                                modifier = Modifier
-                                    .fillMaxWidth(0.6f)
-                                    .padding(horizontal = 20.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(
-                                        0xFF9C254D
-                                    )
-                                )
-                            ) {
-                                Text("Add Restaurant", color = Color.White, fontSize = 16.sp)
-                            }
-                            when (RestaurantUIstate) {
-                                is RestaurantState.Loading -> {
-                                    CircularProgressIndicator()  // Show loading while fetching restaurants
-                                }
+                    val context = LocalContext.current
 
-                                is RestaurantState.Failed -> {
-                                    val errorMessage =
-                                        (RestaurantUIstate as RestaurantState.Failed).errorMessage
-                                    Text(errorMessage)  // Display the error message
+                    Button(
+                        onClick = {
+                            selectedImageUri?.let { uri ->
+                                val imagePart = createImagePart2(context, uri)
+                                if (imagePart != null) {
+                                    cityViewModel.updateCity(
+                                        token = token,
+                                        id = cityId,
+                                        name = cityName1,
+                                        context = context,
+                                        imageUri = uri)
+                                } else {
+                                    Log.e("CityDetailViewAdmin", "Failed to create image part")
                                 }
+                            } ?: Log.e("CityDetailViewAdmin", "No image selected")
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth(0.6f),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C254D))
+                    ) {
+                        Text(
+                            "Update",
+                            color = Color.White,
+                            fontFamily = customFontFamily,
+                            fontSize = 20.sp
+                        )
+                    }
 
-                                is RestaurantState.Success -> {
-                                    val restaurants =
-                                        (RestaurantUIstate as RestaurantState.Success).data
-                                    if (restaurants.isEmpty()) {
-                                        Text("No restaurants available.")
-                                    } else {
-                                        if (token != null) {
-                                            Log.d("HomePage", "Role Id: ${role}")
-                                            RestaurantGridAdmin(
-                                                token = token,
-                                                navController = navController,
-                                                restaurants = Restaurant,
-                                                username = username,
-                                                role = role,
-                                                userId = userId,
-                                                restaurantViewModel = restaurantViewModel
-                                            )
-                                        }
-                                    }
+                    Button(
+                        onClick = {
+                            cityViewModel.deleteCity(
+                                token = token,
+                                id = cityId,
+                                onSuccess = {
+                                    Log.d("CityDetailViewAdmin", "City deleted successfully")
+                                },
+                                onError = { errorMessage ->
+                                    Log.e("CityDetailViewAdmin", "Failed to delete city: $errorMessage")
                                 }
-
-                                is RestaurantState.Start -> {
-                                    Text("Welcome!")  // Initial state or any placeholder UI
-                                }
-                            }
-                        }
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth(0.6f),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C254D))
+                    ) {
+                        Text(
+                            "Delete",
+                            color = Color.White,
+                            fontFamily = customFontFamily,
+                            fontSize = 20.sp
+                        )
                     }
                 }
             }
@@ -228,47 +250,13 @@ fun CityDetailViewAdmin(
     }
 }
 
-@Composable
-fun RestaurantGridAdmin(
-    token: String,
-    navController: NavController,
-    restaurants: List<RestaurantModel>,
-    username : String,
-    role: Int,
-    userId : Int,
-    restaurantViewModel: RestaurantViewModel,
-    modifier: Modifier = Modifier
-) {
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-    ) {
-        items(restaurants) { restaurant ->
-            Row(
-                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                RestaurantCard(
-                    onCardClick = { navController.navigate(ListScreen.RestaurantDetailViewAdmin.name + "/${restaurant.id}/${token}/${username}/${userId}/${role}") },
-//                    onCardClick = { navController.navigate(ListScreen.UpdateRestaurantView.name + "/${restaurant.id}/${token}") },
-                    navController = navController,
-                    restaurant = restaurant,
-                    viewModel = restaurantViewModel,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(8.dp)
-                )
-            }
-        }
-    }
-}
 
 
 /**
  * Create a MultipartBody.Part from a given URI.
  */
 
-fun getRealPathFromURI2(context: Context, uri: Uri): String? {
+fun getRealPathFromURI3(context: Context, uri: Uri): String? {
     val cursor = context.contentResolver.query(uri, null, null, null, null)
     return if (cursor != null && cursor.moveToFirst()) {
         val index = cursor.getColumnIndex("_data")
@@ -280,4 +268,12 @@ fun getRealPathFromURI2(context: Context, uri: Uri): String? {
     }
 }
 
+fun createImagePart2(context: Context, imageUri: Uri): MultipartBody.Part? {
+    val realPath = getRealPathFromURI3(context, imageUri) ?: return null
+    val file = File(realPath)
+    if (!file.exists()) return null
+
+    val requestBody = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
+    return MultipartBody.Part.createFormData("image", file.name, requestBody)
+}
 
