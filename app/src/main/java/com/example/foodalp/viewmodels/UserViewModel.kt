@@ -4,6 +4,7 @@ import LoginRequest
 import RegisterRequest
 import EmailRequest
 import UpdateUserRequest
+import UserModel
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -17,9 +18,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.content.Context
 import androidx.navigation.NavHostController
+import com.example.foodalp.models.RestaurantModel
+import com.example.foodalp.repositories.AuthenticationRepository
+import com.example.foodalp.repositories.NetworkAuthenticationRepository
+import kotlinx.coroutines.flow.MutableStateFlow
 
 
 class UserViewModel : ViewModel() {
+
+    private  val repository = NetworkAuthenticationRepository(AppContainer.authService)
 
     // LiveData for User UI State
     private val _userState = MutableLiveData<UserUIState>()
@@ -28,6 +35,9 @@ class UserViewModel : ViewModel() {
     // LiveData for User Status UI State
     private val _statusState = MutableLiveData<UserStatusUIState>()
     val statusState: LiveData<UserStatusUIState> get() = _statusState
+
+    private val _AllUser = MutableStateFlow<List<UserModel>>(emptyList())
+    val AllUser = _AllUser
 
     // API Services from AppContainer
     private val authService = AppContainer.authService
@@ -276,7 +286,20 @@ class UserViewModel : ViewModel() {
     }
 
 
+    fun getallUser(token: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+//            _userState.value = UserUIState.Loading
+            try {
+                val fetchUser = repository.getalluser(token)
+                _AllUser.value = fetchUser
+//                _userState.value = UserUIState.Success(fetchUser)
+            }catch (e: Exception){
+//                _userState.value = UserUIState.Error(e.localizedMessage ?: "Failed to load user data in email and token")
+                Log.e("UserViewModel", "Error loading user data: ${e.localizedMessage}")
+            }
 
+        }
+    }
 
 
 }

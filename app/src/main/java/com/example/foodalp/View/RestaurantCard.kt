@@ -56,6 +56,7 @@ fun RestaurantCard(
     onCardClick: () -> Unit,
     navController: NavController,
     restaurant: RestaurantModel,
+//    city: String,
     viewModel: RestaurantViewModel,
     modifier: Modifier = Modifier,
 ) {

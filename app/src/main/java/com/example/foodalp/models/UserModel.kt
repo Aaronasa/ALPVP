@@ -1,5 +1,10 @@
 // Response model for User-related API calls
 
+data class UserResponses(
+    val data: List<UserModel>
+)
+
+
 data class UserModel(
     val id: Int,
     val username: String,

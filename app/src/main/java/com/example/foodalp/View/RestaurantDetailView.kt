@@ -1,5 +1,6 @@
 package com.example.foodalp.View
 
+import UserModel
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -62,6 +63,7 @@ import com.example.foodalp.models.ReviewModel
 import com.example.foodalp.uistates.ReviewState
 import com.example.foodalp.viewmodel.RestaurantViewModel
 import com.example.foodalp.viewmodel.ReviewViewModel
+import com.example.foodalp.viewmodels.UserViewModel
 
 @Composable
 fun RestaurantDetailView(
@@ -71,9 +73,18 @@ fun RestaurantDetailView(
     username: String,
     userId: Int,
     role: Int,
+    city: Int,
     RestaurantviewModel: RestaurantViewModel = viewModel(),
-    ReviewViewModel: ReviewViewModel = viewModel()
+    ReviewViewModel: ReviewViewModel = viewModel(),
+    userViewModel: UserViewModel = viewModel()
 ) {
+    val user by userViewModel.AllUser.collectAsState()
+
+    LaunchedEffect(Unit) {
+        if(token != null){
+            userViewModel.getallUser(token)
+        }
+    }
 
     val Review by ReviewViewModel.Review.collectAsState()
     val UIstateReview by ReviewViewModel.UIstate.collectAsState()
@@ -149,7 +160,7 @@ fun RestaurantDetailView(
                 modifier = Modifier.fillMaxSize()
             )
             IconButton(
-                onClick = { navController.navigate(ListScreen.CityDetailView.name + "/${restauranId}/${token}/${username}/${userId}/${role}") },
+                onClick = { navController.navigate(ListScreen.CityDetailView.name + "/${city}/${token}/${username}/${userId}/${role}") },
 //                "/{id}/{token}/{username}/{userId}/{role}"
                 modifier = Modifier
                     .align(Alignment.TopStart)
@@ -228,7 +239,7 @@ fun RestaurantDetailView(
 
             // Menu Item
             Text(
-                text = "Menu Item",
+                text = "Rujak Cingur",
                 fontFamily = customFontFamily,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
@@ -239,7 +250,7 @@ fun RestaurantDetailView(
 
             // Description
             Text(
-                text = "description",
+                text = "Rujak cingur biasanya terdiri dari irisan beberapa jenis buah seperti timun, kerahi (krai, yaitu sejenis timun khas Jawa Timur atau blungkak dalam Bahasa Madura), bengkuang, mangga muda, nanas, kedondong, kemudian ditambah lontong, tahu, tempe, bendhoyo, cingur, serta sayuran seperti kecambah/taoge, kangkung, dan kacang panjang.",
                 fontFamily = customFontFamily,
                 fontWeight = FontWeight.W200,
                 fontSize = 16.sp,
@@ -260,7 +271,7 @@ fun RestaurantDetailView(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "price",
+                text = "Rp. 35.000",
                 fontFamily = customFontFamily,
                 fontWeight = FontWeight.W200,
                 fontSize = 16.sp,
@@ -309,7 +320,10 @@ fun RestaurantDetailView(
             is ReviewState.Success -> {
                 val reviews = (UIstateReview as ReviewState.Success).data
                 if (reviews.isEmpty()) {
-                    Text("No reviews available.")
+                    Row (modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center) {
+                        Text("No reviews available.")
+                    }
                 } else {
                         ReviewGrid(
                             token = token,
@@ -319,6 +333,7 @@ fun RestaurantDetailView(
                             role = role,
                             userid = userId,
                             username = username,
+                            user = user,
                             reviewViewModel = ReviewViewModel
                         )
                 }
@@ -340,15 +355,18 @@ fun ReviewGrid(
     username: String,
     role: Int,
     userid: Int,
+    user: List<UserModel>,
     reviewViewModel: ReviewViewModel,
     modifier: Modifier = Modifier
 ) {
+
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
         items(reviews) { review ->
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween

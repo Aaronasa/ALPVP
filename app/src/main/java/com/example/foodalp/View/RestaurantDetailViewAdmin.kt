@@ -1,5 +1,6 @@
 package com.example.foodalp.View
 
+import UserModel
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -62,6 +63,7 @@ import com.example.foodalp.models.ReviewModel
 import com.example.foodalp.uistates.ReviewState
 import com.example.foodalp.viewmodel.RestaurantViewModel
 import com.example.foodalp.viewmodel.ReviewViewModel
+import com.example.foodalp.viewmodels.UserViewModel
 
 @Composable
 fun RestaurantDetailViewAdmin(
@@ -72,8 +74,16 @@ fun RestaurantDetailViewAdmin(
     userId: Int,
     role: Int,
     RestaurantviewModel: RestaurantViewModel = viewModel(),
-    ReviewViewModel: ReviewViewModel = viewModel()
+    ReviewViewModel: ReviewViewModel = viewModel(),
+    userViewModel: UserViewModel = viewModel()
 ) {
+    val user by userViewModel.AllUser.collectAsState()
+
+    LaunchedEffect(Unit) {
+        if(token != null){
+            userViewModel.getallUser(token)
+        }
+    }
 
     val Review by ReviewViewModel.admin.collectAsState()
     val UIstateReview by ReviewViewModel.UIstate.collectAsState()
@@ -342,6 +352,7 @@ fun RestaurantDetailViewAdmin(
                         role = role,
                         userid = userId,
                         username = username,
+                        user = user,
                         reviewViewModel = ReviewViewModel
                     )
                 }
@@ -363,6 +374,7 @@ fun ReviewGridAdmin(
     username: String,
     role: Int,
     userid: Int,
+    user: List<UserModel>,
     reviewViewModel: ReviewViewModel,
     modifier: Modifier = Modifier
 ) {

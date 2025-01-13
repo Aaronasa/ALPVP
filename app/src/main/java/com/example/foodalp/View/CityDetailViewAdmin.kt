@@ -210,6 +210,7 @@ fun CityDetailViewAdmin(
                                                 username = username,
                                                 role = role,
                                                 userId = userId,
+                                                city = cityId,
                                                 restaurantViewModel = restaurantViewModel
                                             )
                                         }
@@ -236,6 +237,7 @@ fun RestaurantGridAdmin(
     username : String,
     role: Int,
     userId : Int,
+    city: Int,
     restaurantViewModel: RestaurantViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -249,7 +251,7 @@ fun RestaurantGridAdmin(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 RestaurantCard(
-                    onCardClick = { navController.navigate(ListScreen.RestaurantDetailViewAdmin.name + "/${restaurant.id}/${token}/${username}/${userId}/${role}") },
+                    onCardClick = { navController.navigate(ListScreen.RestaurantDetailViewAdmin.name + "/${restaurant.id}/${token}/${username}/${userId}/${role}/${city}") },
 //                    onCardClick = { navController.navigate(ListScreen.UpdateRestaurantView.name + "/${restaurant.id}/${token}") },
                     navController = navController,
                     restaurant = restaurant,

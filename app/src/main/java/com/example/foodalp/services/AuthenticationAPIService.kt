@@ -11,6 +11,7 @@ import RegisterResponse
 import UpdateUserRequest
 import UserModel
 import UserResponse
+import UserResponses
 import android.util.Log
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -54,9 +55,9 @@ interface AuthenticationAPIService {
         @Header("x-API-Token") token: String
     ): Response<DeleteResponse>
 
-    @GET("/admin/read")
+    @GET("/admin/read/all")
     suspend fun getAllUsers(
         @Header("x-API-Token") token: String
-    ): Response<List<UserModel>>
+    ): UserResponses
 
 }

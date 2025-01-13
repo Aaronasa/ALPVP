@@ -26,7 +26,7 @@ interface AuthenticationRepository {
     suspend fun logout(token: String): Result<String>
     suspend fun delete(token: String): Result<String>
     suspend fun updateUser(token: String, username: String, email: String): Response<UserResponse>
-    suspend fun getalluser(token: String): Response<List<UserModel>>
+    suspend fun getalluser(token: String): List<UserModel>
 }
 
 // Network Authentication Repository implementation
@@ -126,9 +126,11 @@ class NetworkAuthenticationRepository(
         }
     }
 
-    override suspend fun getalluser(token: String): Response<List<UserModel>> {
+    override suspend fun getalluser(token: String): List<UserModel> {
         return try {
-            authenticationAPIService.getAllUsers(token)
+            val response = authenticationAPIService.getAllUsers(token)
+            response.data
+
         } catch (e: Exception) {
             throw Exception("Failed to get all users: ${e.localizedMessage}", e)
         }

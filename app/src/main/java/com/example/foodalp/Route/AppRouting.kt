@@ -210,13 +210,14 @@ fun AppRouting() {
                 }
             }
             composable(
-                route = ListScreen.RestaurantDetailView.name + "/{id}/{token}/{username}/{userId}/{role}",
+                route = ListScreen.RestaurantDetailView.name + "/{id}/{token}/{username}/{userId}/{role}/{city}",
                 arguments = listOf(
                     navArgument("id") { type = NavType.IntType },
                     navArgument("token") { type = NavType.StringType },
                     navArgument("username") { type = NavType.StringType },
                     navArgument("userId") { type = NavType.IntType },
-                    navArgument("role") { type = NavType.IntType }
+                    navArgument("role") { type = NavType.IntType },
+                    navArgument("city") { type = NavType.IntType }
                 )
             ) { backStackEntry ->
                 val restaurantId = backStackEntry.arguments?.getInt("id")
@@ -224,14 +225,16 @@ fun AppRouting() {
                 val username = backStackEntry.arguments?.getString("username")
                 val userId = backStackEntry.arguments?.getInt("userId")
                 val role = backStackEntry.arguments?.getInt("role")
-                if (restaurantId != null && token != null && username != null && userId != null && role != null) {
+                val city = backStackEntry.arguments?.getInt("city")
+                if (restaurantId != null && token != null && username != null && userId != null && role != null && city != null) {
                     RestaurantDetailView(
                         navController,
                         restaurantId,
                         token,
                         username,
                         userId,
-                        role
+                        role,
+                        city
                     )
                 }
             }

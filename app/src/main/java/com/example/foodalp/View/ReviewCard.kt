@@ -18,6 +18,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +38,7 @@ import com.example.foodalp.R
 import com.example.foodalp.models.ReviewModel
 import com.example.foodalp.viewmodel.RestaurantViewModel
 import com.example.foodalp.viewmodel.ReviewViewModel
+import com.example.foodalp.viewmodels.UserViewModel
 
 @Composable
 fun ReviewCard(
@@ -48,8 +52,12 @@ fun ReviewCard(
     role: Int,
     ReviewViewModel: ReviewViewModel,
     RestaurantViewModel: RestaurantViewModel = viewModel(),
+    userViewModel : UserViewModel = viewModel(),
     modifier: Modifier = Modifier,
 ) {
+
+
+
 
     val Restaurant by RestaurantViewModel.Restaurant.collectAsState()
     val UIstate by RestaurantViewModel.UIstate.collectAsState()
