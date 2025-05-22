@@ -15,9 +15,9 @@ data class UserModel(
 )
 
 data class UserResponse(
-    val data: UserModel?,  // The user data you need
-    val status: String,    // Optional: status of the response
-    val message: String?   // Optional: error or success message
+    val data: UserModel?,
+    val status: String,
+    val message: String?
 )
 
 data class EmailRequest(
